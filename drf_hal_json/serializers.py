@@ -13,13 +13,19 @@ from drf_hal_json import LINKS_FIELD_NAME, EMBEDDED_FIELD_NAME
 class HalEmbeddedSerializer(NestedFieldsSerializerMixin, ModelSerializer):
     pass
 
+class HalHyperlinkedModelSerializer(HyperlinkedModelSerializer):
+
+    def to_representation(self, instance):
+        representation = super().to_representation(instance)
+        hal_representation = OrderedDict((k, {'href': v}) for (k, v) in representation.items())
+        return hal_representation
 
 class HalModelSerializer(NestedFieldsSerializerMixin, ModelSerializer):
     """
     Serializer for HAL representation of django models
     """
     serializer_related_field = HyperlinkedRelatedField
-    links_serializer_class = HyperlinkedModelSerializer
+    links_serializer_class = HalHyperlinkedModelSerializer
     embedded_serializer_class = HalEmbeddedSerializer
 
     def __init__(self, instance=None, data=empty, **kwargs):
@@ -58,7 +64,6 @@ class HalModelSerializer(NestedFieldsSerializerMixin, ModelSerializer):
     def _get_links_serializer(self, model_cls, link_field_names):
         class HalNestedLinksSerializer(self.links_serializer_class):
             serializer_related_field = self.serializer_related_field
-            serializer_url_field = self.serializer_url_field
 
             class Meta:
                 model = model_cls

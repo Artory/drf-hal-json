@@ -38,6 +38,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'drf_hal_json.pagination.HalPageNumberPagination',
     'DEFAULT_PARSER_CLASSES': ('drf_hal_json.parsers.JsonHalParser',),
     'DEFAULT_RENDERER_CLASSES': ('drf_hal_json.renderers.JsonHalRenderer',),
+    'URL_FIELD_NAME': 'self',
 }
 
 STATIC_URL = '/static/'

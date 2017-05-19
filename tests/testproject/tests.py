@@ -1,6 +1,5 @@
 from django.test import TestCase
 from rest_framework.reverse import reverse
-from rest_framework.settings import api_settings
 
 from drf_hal_json import LINKS_FIELD_NAME, EMBEDDED_FIELD_NAME
 from .models import TestResource, RelatedResource1, RelatedResource2
@@ -32,9 +31,9 @@ class HalTest(TestCase):
         test_resource_links = resp.data[0][LINKS_FIELD_NAME]
         self.assertEqual(2, len(test_resource_links))
         self.assertEqual(self.TESTSERVER_URL + reverse('testresource-detail', kwargs={'pk': self.test_resource_1.id}),
-                         test_resource_links[api_settings.URL_FIELD_NAME])
+                         test_resource_links['self']['href'])
         self.assertEqual(self.TESTSERVER_URL + reverse('relatedresource1-detail', kwargs={'pk': self.related_resource_1.id}),
-                         test_resource_links['related_resource_1'])
+                         test_resource_links['related_resource_1']['href'])
 
     def test_embedded_resource_data(self):
         resp = self.client.get("/test-resources/")
@@ -50,7 +49,7 @@ class HalTest(TestCase):
         related_resource_2_links = related_resource_2_data[LINKS_FIELD_NAME]
         self.assertEqual(1, len(related_resource_2_links))
         self.assertEqual(self.TESTSERVER_URL + reverse('relatedresource2-detail', kwargs={'pk': self.related_resource_2.id}),
-                         related_resource_2_links[api_settings.URL_FIELD_NAME])
+                         related_resource_2_links['self']['href'])
 
     def test_deep_embedding(self):
         resp = self.client.get("/test-resources/")
@@ -67,9 +66,9 @@ class HalTest(TestCase):
         self.assertEqual(self.nested_related_resource_1_1.name, nested_related_resources_data[0]['name'])
         self.assertEqual(
             self.TESTSERVER_URL + reverse('relatedresource1-detail', kwargs={'pk': self.nested_related_resource_1_1.id}),
-            nested_related_resources_data[0][LINKS_FIELD_NAME][api_settings.URL_FIELD_NAME])
+            nested_related_resources_data[0][LINKS_FIELD_NAME]['self']['href'])
         self.assertEqual(self.nested_related_resource_1_2.id, nested_related_resources_data[1]['id'])
         self.assertEqual(self.nested_related_resource_1_2.name, nested_related_resources_data[1]['name'])
         self.assertEqual(
             self.TESTSERVER_URL + reverse('relatedresource1-detail', kwargs={'pk': self.nested_related_resource_1_2.id}),
-            nested_related_resources_data[1][LINKS_FIELD_NAME][api_settings.URL_FIELD_NAME])
+            nested_related_resources_data[1][LINKS_FIELD_NAME]['self']['href'])

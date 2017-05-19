@@ -10,6 +10,9 @@ Extension for Django REST Framework 3 which allows for using content-type applic
     	'DEFAULT_PAGINATION_CLASS': 'drf_hal_json.pagination.HalPageNumberPagination',
     	'DEFAULT_PARSER_CLASSES': ('drf_hal_json.parsers.JsonHalParser',),
     	'DEFAULT_RENDERER_CLASSES': ('drf_hal_json.renderers.JsonHalRenderer',),
+        
+        # To make self links render as 'self' and not 'url', as per the HAL spec
+        'URL_FIELD_NAME': 'self',
 	}
 
 ## Requirement ##
@@ -44,15 +47,15 @@ Request:
 
 	{
     	"_links": {
-        	"self": "http://localhost/api/resources/1/",
-			"relatedResource": "http://localhost/api/related-resources/1/"
+        	"self": {"href": "http://localhost/api/resources/1/"},
+			"relatedResource": {"href": "http://localhost/api/related-resources/1/"}
     	},
     	"id": 1,
     	"_embedded": {
         	"subResource": {
             	"_links": {
-                	"self": "http://localhost/resources/1/sub-resources/26/"
-                	"subSubResource": "http://localhost/resources/1/sub-resources/26/sub-sub-resources/3"
+                	"self": {"href": "http://localhost/resources/1/sub-resources/26/"},
+                	"subSubResource": {"href": "http://localhost/resources/1/sub-resources/26/sub-sub-resources/3"}
             	},
             	"id": 26,
             	"name": "Sub Resource 26"
