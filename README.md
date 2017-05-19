@@ -7,10 +7,10 @@ Extension for Django REST Framework 3 which allows for using content-type applic
 	pip install drf-hal-json
 	
 	REST_FRAMEWORK = {
-    	'DEFAULT_PAGINATION_CLASS': 'drf_hal_json.pagination.HalPageNumberPagination',
-    	'DEFAULT_PARSER_CLASSES': ('drf_hal_json.parsers.JsonHalParser',),
-    	'DEFAULT_RENDERER_CLASSES': ('drf_hal_json.renderers.JsonHalRenderer',),
-        
+        'DEFAULT_PAGINATION_CLASS': 'drf_hal_json.pagination.HalPageNumberPagination',
+        'DEFAULT_PARSER_CLASSES': ('drf_hal_json.parsers.JsonHalParser',),
+        'DEFAULT_RENDERER_CLASSES': ('drf_hal_json.renderers.JsonHalRenderer',),
+
         # To make self links render as 'self' and not 'url', as per the HAL spec
         'URL_FIELD_NAME': 'self',
 	}
