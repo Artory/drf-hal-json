@@ -18,7 +18,7 @@ class HalTest(TestCase):
         self.test_resource_1 = TestResource.objects.create(name="Test-Resource", related_resource_1=self.related_resource_1,
                                                            related_resource_2=self.related_resource_2)
 
-    def testGetHalResource(self):
+    def test_basic_data(self):
         resp = self.client.get("/test-resources/")
         self.assertEqual(200, resp.status_code, resp.content)
         self.assertEqual(1, len(resp.data))
@@ -26,20 +26,37 @@ class HalTest(TestCase):
         self.assertEqual(4, len(test_resource_data))
         self.assertEqual(self.test_resource_1.id, test_resource_data['id'])
         self.assertEqual(self.test_resource_1.name, test_resource_data['name'])
-        test_resource_links = test_resource_data[LINKS_FIELD_NAME]
+
+    def test_links(self):
+        resp = self.client.get("/test-resources/")
+        test_resource_links = resp.data[0][LINKS_FIELD_NAME]
         self.assertEqual(2, len(test_resource_links))
         self.assertEqual(self.TESTSERVER_URL + reverse('testresource-detail', kwargs={'pk': self.test_resource_1.id}),
                          test_resource_links[api_settings.URL_FIELD_NAME])
         self.assertEqual(self.TESTSERVER_URL + reverse('relatedresource1-detail', kwargs={'pk': self.related_resource_1.id}),
                          test_resource_links['related_resource_1'])
 
+    def test_embedded_resource_data(self):
+        resp = self.client.get("/test-resources/")
+        test_resource_data = resp.data[0]
         related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
         self.assertEqual(3, len(related_resource_2_data))
         self.assertEqual(self.related_resource_2.name, related_resource_2_data['name'])
+
+    def test_embedded_resource_links(self):
+        resp = self.client.get("/test-resources/")
+        test_resource_data = resp.data[0]
+        related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
         related_resource_2_links = related_resource_2_data[LINKS_FIELD_NAME]
         self.assertEqual(1, len(related_resource_2_links))
         self.assertEqual(self.TESTSERVER_URL + reverse('relatedresource2-detail', kwargs={'pk': self.related_resource_2.id}),
                          related_resource_2_links[api_settings.URL_FIELD_NAME])
+
+    def test_deep_embedding(self):
+        resp = self.client.get("/test-resources/")
+        test_resource_data = resp.data[0]
+        related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
+        related_resource_2_links = related_resource_2_data[LINKS_FIELD_NAME]
         related_resource_2_embedded = related_resource_2_data[EMBEDDED_FIELD_NAME]
         self.assertEqual(1, len(related_resource_2_embedded))
         nested_related_resources_data = related_resource_2_embedded['related_resources_1']
