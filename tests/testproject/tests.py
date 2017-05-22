@@ -29,11 +29,13 @@ class HalTest(TestCase):
     def test_links(self):
         resp = self.client.get("/test-resources/")
         test_resource_links = resp.data[0][LINKS_FIELD_NAME]
-        self.assertEqual(2, len(test_resource_links))
+        self.assertEqual(3, len(test_resource_links))
         self.assertEqual(self.TESTSERVER_URL + reverse('testresource-detail', kwargs={'pk': self.test_resource_1.id}),
                          test_resource_links['self']['href'])
         self.assertEqual(self.TESTSERVER_URL + reverse('relatedresource1-detail', kwargs={'pk': self.related_resource_1.id}),
                          test_resource_links['related_resource_1']['href'])
+        self.assertEqual(self.TESTSERVER_URL + reverse('relatedresource2-detail', kwargs={'pk': self.related_resource_2.id}),
+                         test_resource_links['related_resource_2']['href'])
 
     def test_embedded_resource_data(self):
         resp = self.client.get("/test-resources/")
