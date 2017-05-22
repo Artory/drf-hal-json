@@ -14,7 +14,7 @@ class HalEmbeddedSerializer(HyperlinkedModelSerializer):
 
 class HalHyperlinkedModelSerializer(HyperlinkedModelSerializer):
     def to_representation(self, instance):
-        representation = super().to_representation(instance)
+        representation = super(HyperlinkedModelSerializer, self).to_representation(instance)
         hal_representation = OrderedDict((k, {'href': v}) for (k, v) in representation.items())
         return hal_representation
 
