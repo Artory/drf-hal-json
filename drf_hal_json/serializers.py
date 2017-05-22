@@ -39,18 +39,20 @@ class HalModelSerializer(NestedFieldsSerializerMixin, ModelSerializer):
 
         embedded_field_names = list()
         link_field_names = list()
+        link_fields = {}
         resulting_fields = OrderedDict()
         resulting_fields[LINKS_FIELD_NAME] = None  # assign it here because of the order -> links first
 
         for field_name, field in fields.items():
             if self._is_link_field(field):
                 link_field_names.append(field_name)
+                link_fields[field_name] = field
             elif self._is_embedded_field(field):
                 embedded_field_names.append(field_name)
             else:
                 resulting_fields[field_name] = field
 
-        links_serializer = self._get_links_serializer(self.Meta.model, link_field_names)
+        links_serializer = self._get_links_serializer(self.Meta.model, link_field_names, link_fields)
         if not links_serializer:
             # in case the class is overridden and the inheriting class wants no links to be serialized, the links field is removed
             del resulting_fields[LINKS_FIELD_NAME]
@@ -61,14 +63,17 @@ class HalModelSerializer(NestedFieldsSerializerMixin, ModelSerializer):
                                                                                   embedded_field_names)
         return resulting_fields
 
-    def _get_links_serializer(self, model_cls, link_field_names):
+    def _get_links_serializer(self, model_cls, link_field_names, fields):
         class HalNestedLinksSerializer(self.links_serializer_class):
             serializer_related_field = self.serializer_related_field
 
             class Meta:
                 model = model_cls
-                fields = [api_settings.URL_FIELD_NAME] + link_field_names
+                fields = link_field_names
                 extra_kwargs = getattr(self.Meta, 'extra_kwargs', {})
+
+            def get_fields(self):
+                return fields
 
         return HalNestedLinksSerializer(instance=self.instance, source="*")
 
