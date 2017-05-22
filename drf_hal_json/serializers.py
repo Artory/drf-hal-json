@@ -1,26 +1,24 @@
 from collections import OrderedDict
 
 from rest_framework.fields import empty
-from rest_framework.relations import RelatedField, ManyRelatedField, HyperlinkedRelatedField
-from rest_framework.relations import HyperlinkedIdentityField
-from rest_framework.serializers import ModelSerializer, HyperlinkedModelSerializer, BaseSerializer
-from rest_framework.settings import api_settings
-from drf_nested_fields.serializers import NestedFieldsSerializerMixin
+from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, ManyRelatedField, RelatedField
+from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer
 
-from drf_hal_json import LINKS_FIELD_NAME, EMBEDDED_FIELD_NAME
+from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME
 
 
-class HalEmbeddedSerializer(NestedFieldsSerializerMixin, ModelSerializer):
+class HalEmbeddedSerializer(HyperlinkedModelSerializer):
     pass
 
-class HalHyperlinkedModelSerializer(HyperlinkedModelSerializer):
 
+class HalHyperlinkedModelSerializer(HyperlinkedModelSerializer):
     def to_representation(self, instance):
         representation = super().to_representation(instance)
         hal_representation = OrderedDict((k, {'href': v}) for (k, v) in representation.items())
         return hal_representation
 
-class HalModelSerializer(NestedFieldsSerializerMixin, ModelSerializer):
+
+class HalModelSerializer(HyperlinkedModelSerializer):
     """
     Serializer for HAL representation of django models
     """
@@ -38,6 +36,7 @@ class HalModelSerializer(NestedFieldsSerializerMixin, ModelSerializer):
         fields = super(HalModelSerializer, self).get_fields()
 
         embedded_field_names = list()
+        embedded_fields = {}
         link_field_names = list()
         link_fields = {}
         resulting_fields = OrderedDict()
@@ -49,6 +48,7 @@ class HalModelSerializer(NestedFieldsSerializerMixin, ModelSerializer):
                 link_fields[field_name] = field
             elif self._is_embedded_field(field):
                 embedded_field_names.append(field_name)
+                embedded_fields[field_name] = field
             else:
                 resulting_fields[field_name] = field
 
@@ -59,8 +59,10 @@ class HalModelSerializer(NestedFieldsSerializerMixin, ModelSerializer):
         else:
             resulting_fields[LINKS_FIELD_NAME] = links_serializer
         if embedded_field_names:
-            resulting_fields[EMBEDDED_FIELD_NAME] = self._get_embedded_serializer(self.Meta.model, getattr(self.Meta, "depth", 0),
-                                                                                  embedded_field_names)
+            resulting_fields[EMBEDDED_FIELD_NAME] = self._get_embedded_serializer(self.Meta.model,
+                                                                                  getattr(self.Meta, "depth", 0),
+                                                                                  embedded_field_names,
+                                                                                  embedded_fields)
         return resulting_fields
 
     def _get_links_serializer(self, model_cls, link_field_names, fields):
@@ -77,7 +79,7 @@ class HalModelSerializer(NestedFieldsSerializerMixin, ModelSerializer):
 
         return HalNestedLinksSerializer(instance=self.instance, source="*")
 
-    def _get_embedded_serializer(self, model_cls, embedded_depth, embedded_field_names):
+    def _get_embedded_serializer(self, model_cls, embedded_depth, embedded_field_names, fields):
         defined_nested_fields = getattr(self.Meta, "nested_fields", None)
         nested_class = self.__class__
 
@@ -90,6 +92,9 @@ class HalModelSerializer(NestedFieldsSerializerMixin, ModelSerializer):
                 nested_fields = defined_nested_fields
                 depth = embedded_depth
                 extra_kwargs = getattr(self.Meta, 'extra_kwargs', {})
+
+            def get_fields(self):
+                return fields
 
         return HalNestedEmbeddedSerializer(source="*")
 
