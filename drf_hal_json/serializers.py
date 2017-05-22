@@ -51,7 +51,13 @@ class HalModelSerializer(HyperlinkedModelSerializer):
             elif self._is_embedded_field(field):
                 # if a related resource is embedded, it should still
                 # get a link in the parent object
-                link_fields[field_name] = deepcopy(field[LINKS_FIELD_NAME][URL_FIELD_NAME])
+
+                try:
+                    link_fields[field_name] = deepcopy(field[LINKS_FIELD_NAME][URL_FIELD_NAME])
+                except TypeError:
+                    # List fields are not subscriptable -- we won't have links to an embedded field that is an array
+                    pass
+
                 embedded_field_names.append(field_name)
                 embedded_fields[field_name] = field
             else:
