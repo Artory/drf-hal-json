@@ -5,17 +5,8 @@ from .models import TestResource, RelatedResource2, RelatedResource1
 class TestResourceSerializer(HalModelSerializer):
     class Meta:
         model = TestResource
-        fields = ('id', 'name', 'related_resource_1')
-        nested_fields = {
-            'related_resource_2': (
-                ['name'],
-                {
-                    'related_resources_1': (
-                        ['id', 'name'],
-                        {}
-                    )
-                })
-        }
+        fields = ('self', 'id', 'name', 'related_resource_1')
+        depth = 1
 
 
 class RelatedResource1Serializer(HalModelSerializer):
