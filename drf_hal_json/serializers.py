@@ -1,4 +1,5 @@
 from collections import OrderedDict
+from copy import deepcopy
 
 from rest_framework.fields import empty
 from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, ManyRelatedField, RelatedField
@@ -48,7 +49,9 @@ class HalModelSerializer(HyperlinkedModelSerializer):
                 link_field_names.append(field_name)
                 link_fields[field_name] = field
             elif self._is_embedded_field(field):
-                link_fields[field_name] = field[LINKS_FIELD_NAME][URL_FIELD_NAME]
+                # if a related resource is embedded, it should still
+                # get a link in the parent object
+                link_fields[field_name] = deepcopy(field[LINKS_FIELD_NAME][URL_FIELD_NAME])
                 embedded_field_names.append(field_name)
                 embedded_fields[field_name] = field
             else:
