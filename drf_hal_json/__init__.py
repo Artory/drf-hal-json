@@ -2,6 +2,7 @@ from django.conf import settings
 
 USER_SETTINGS = getattr(settings, "REST_HAL", {})
 
+URL_FIELD_NAME = USER_SETTINGS.get("URL_FIELD_NAME", "self")
 LINKS_FIELD_NAME = USER_SETTINGS.get("LINKS_FIELD_NAME", "_links")
 EMBEDDED_FIELD_NAME = USER_SETTINGS.get("EMBEDDED_FIELD_NAME", "_embedded")
 

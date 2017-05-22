@@ -5,7 +5,7 @@ from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelate
 from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer
 from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 
-from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME
+from drf_hal_json import URL_FIELD_NAME, EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME
 
 
 class HalEmbeddedSerializer(HyperlinkedModelSerializer):
@@ -48,6 +48,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
                 link_field_names.append(field_name)
                 link_fields[field_name] = field
             elif self._is_embedded_field(field):
+                link_fields[field_name] = field[LINKS_FIELD_NAME][URL_FIELD_NAME]
                 embedded_field_names.append(field_name)
                 embedded_fields[field_name] = field
             else:
