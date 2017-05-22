@@ -82,10 +82,8 @@ class HalTest(TestCase):
     def test_custom_lookup_field(self):
         resp = self.client.get("/custom-resource/")
         custom_resource_links = resp.data[0][LINKS_FIELD_NAME]
-        self.assertEqual(2, len(test_resource_links))
+        self.assertEqual(2, len(custom_resource_links))
         self.assertEqual(self.TESTSERVER_URL + reverse('customresource-detail', kwargs={'pk': self.custom_resource_1.id}),
-                         test_resource_links['self']['href'])
-
-        # TODO: are the kwargs correct? Shouldn't it be the name of the related resource?
+                         custom_resource_links['self']['href'])
         self.assertEqual(self.TESTSERVER_URL + reverse('relatedresource3-detail', kwargs={'name': self.custom_resource_1.name}),
-                         test_resource_links['related_resource_3']['href'])
+                         custom_resource_links['related_resource_3']['href'])

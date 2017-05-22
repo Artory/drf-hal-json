@@ -34,13 +34,10 @@ class RelatedResource3Serializer(HalModelSerializer):
         model = RelatedResource3
 
 
-# Test fails if using HalModelSerializer:
-#
-# class CustomResourceSerializer(serializers.HyperlinkedModelSerializer):
 class CustomResourceSerializer(HalModelSerializer):
     related_resource_3 = serializers.HyperlinkedIdentityField(
         read_only=True, view_name='relatedresource3-detail', lookup_field='name')
 
     class Meta:
         model = CustomResource
-        fields = ('name', 'related_resource_3')
+        fields = ('self', 'name', 'related_resource_3')
