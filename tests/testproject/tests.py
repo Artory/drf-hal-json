@@ -2,7 +2,7 @@ from django.test import TestCase
 from rest_framework.reverse import reverse
 
 from drf_hal_json import LINKS_FIELD_NAME, EMBEDDED_FIELD_NAME
-from .models import TestResource, RelatedResource1, RelatedResource2
+from .models import CustomResource, TestResource, RelatedResource1, RelatedResource2, RelatedResource3
 
 
 class HalTest(TestCase):
@@ -16,6 +16,8 @@ class HalTest(TestCase):
         self.related_resource_2.related_resources_1.add(self.nested_related_resource_1_1, self.nested_related_resource_1_2)
         self.test_resource_1 = TestResource.objects.create(name="Test-Resource", related_resource_1=self.related_resource_1,
                                                            related_resource_2=self.related_resource_2)
+        self.related_resource_3 = RelatedResource3.objects.create(name="Related-Resource3")
+        self.custom_resource_1 = CustomResource.objects.create(name="Custom-Resource", related_resource_3=self.related_resource_3)
 
     def test_basic_data(self):
         resp = self.client.get("/test-resources/")
@@ -28,6 +30,7 @@ class HalTest(TestCase):
 
     def test_links(self):
         resp = self.client.get("/test-resources/")
+
         test_resource_links = resp.data[0][LINKS_FIELD_NAME]
         self.assertEqual(3, len(test_resource_links))
         self.assertEqual(self.TESTSERVER_URL + reverse('testresource-detail', kwargs={'pk': self.test_resource_1.id}),
@@ -74,3 +77,15 @@ class HalTest(TestCase):
         self.assertEqual(
             self.TESTSERVER_URL + reverse('relatedresource1-detail', kwargs={'pk': self.nested_related_resource_1_2.id}),
             nested_related_resources_data[1][LINKS_FIELD_NAME]['self']['href'])
+
+    # Test that fails due to failure to hand lookup_field properly
+    def test_custom_lookup_field(self):
+        resp = self.client.get("/custom-resource/")
+        custom_resource_links = resp.data[0][LINKS_FIELD_NAME]
+        self.assertEqual(2, len(test_resource_links))
+        self.assertEqual(self.TESTSERVER_URL + reverse('customresource-detail', kwargs={'pk': self.custom_resource_1.id}),
+                         test_resource_links['self']['href'])
+
+        # TODO: are the kwargs correct? Shouldn't it be the name of the related resource?
+        self.assertEqual(self.TESTSERVER_URL + reverse('relatedresource3-detail', kwargs={'name': self.custom_resource_1.name}),
+                         test_resource_links['related_resource_3']['href'])

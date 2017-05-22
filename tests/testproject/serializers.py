@@ -1,5 +1,7 @@
 from drf_hal_json.serializers import HalModelSerializer
-from .models import TestResource, RelatedResource2, RelatedResource1
+from rest_framework import serializers
+
+from .models import CustomResource, TestResource, RelatedResource1, RelatedResource2, RelatedResource3
 
 
 class RelatedResource1Serializer(HalModelSerializer):
@@ -25,3 +27,20 @@ class TestResourceSerializer(HalModelSerializer):
     class Meta:
         model = TestResource
         fields = ('self', 'id', 'name', 'related_resource_1', 'related_resource_2')
+
+
+class RelatedResource3Serializer(HalModelSerializer):
+    class Meta:
+        model = RelatedResource3
+
+
+# Test fails if using HalModelSerializer:
+#
+# class CustomResourceSerializer(serializers.HyperlinkedModelSerializer):
+class CustomResourceSerializer(HalModelSerializer):
+    related_resource_3 = serializers.HyperlinkedIdentityField(
+        read_only=True, view_name='relatedresource3-detail', lookup_field='name')
+
+    class Meta:
+        model = CustomResource
+        fields = ('name', 'related_resource_3')
