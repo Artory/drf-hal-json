@@ -41,7 +41,7 @@ class HalTest(TestCase):
         resp = self.client.get("/test-resources/")
         test_resource_data = resp.data[0]
         related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
-        self.assertEqual(3, len(related_resource_2_data))
+        self.assertEqual(5, len(related_resource_2_data))
         self.assertEqual(self.related_resource_2.name, related_resource_2_data['name'])
 
     def test_embedded_resource_links(self):
@@ -62,8 +62,8 @@ class HalTest(TestCase):
         self.assertEqual(1, len(related_resource_2_embedded))
         nested_related_resources_data = related_resource_2_embedded['related_resources_1']
         self.assertEqual(2, len(nested_related_resources_data))
-        self.assertEqual(3, len(nested_related_resources_data[0]))
-        self.assertEqual(3, len(nested_related_resources_data[1]))
+        self.assertEqual(4, len(nested_related_resources_data[0]))
+        self.assertEqual(4, len(nested_related_resources_data[1]))
         self.assertEqual(self.nested_related_resource_1_1.id, nested_related_resources_data[0]['id'])
         self.assertEqual(self.nested_related_resource_1_1.name, nested_related_resources_data[0]['name'])
         self.assertEqual(
