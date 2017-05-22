@@ -3,6 +3,7 @@ from collections import OrderedDict
 from rest_framework.fields import empty
 from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, ManyRelatedField, RelatedField
 from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer
+from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME
 
@@ -106,3 +107,18 @@ class HalModelSerializer(HyperlinkedModelSerializer):
     @staticmethod
     def _is_embedded_field(field):
         return isinstance(field, BaseSerializer)
+
+    def build_nested_field(self, field_name, relation_info, nested_depth):
+        """
+        Create nested fields for forward and reverse relationships.
+        """
+        class NestedSerializer(HalModelSerializer):
+            class Meta:
+                model = relation_info.related_model
+                depth = nested_depth - 1
+                fields = '__all__'
+
+        field_class = NestedSerializer
+        field_kwargs = get_nested_relation_kwargs(relation_info)
+
+        return field_class, field_kwargs
