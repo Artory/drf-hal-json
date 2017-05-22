@@ -1,6 +1,6 @@
 drf-hal-json
 =================
-Extension for Django REST Framework 3 which allows for using content-type application/hal-json. Its build on top of https://github.com/seebass/drf-nested-fields
+Extension for Django REST Framework 3 which allows for using content-type application/hal-json. 
 
 ## Setup ##
 
@@ -20,7 +20,6 @@ Extension for Django REST Framework 3 which allows for using content-type applic
 * Python 2.7+
 * Django 1.6+
 * Django REST Framework 3
-* drf-nested-fields 0.9+
 
 ## Features ##
 
