@@ -12,8 +12,8 @@ class HalPageNumberPagination(PageNumberPagination):
         result = OrderedDict()
         links = OrderedDict()
         links[api_settings.URL_FIELD_NAME] = self.request.build_absolute_uri()
-        links['next'] = self.get_next_link()
-        links['previous'] = self.get_previous_link()
+        links['next'] = {'href': self.get_next_link()}
+        links['previous'] = {'href': self.get_previous_link()}
         result[LINKS_FIELD_NAME] = links
         result['count'] = self.page.paginator.count
         result['page_size'] = self.get_page_size(self.request)
@@ -26,8 +26,8 @@ class HalCursorPagination(CursorPagination):
         result = OrderedDict()
         links = OrderedDict()
         links[api_settings.URL_FIELD_NAME] = self.base_url
-        links['next'] = self.get_next_link()
-        links['previous'] = self.get_previous_link()
+        links['next'] = {'href': self.get_next_link()}
+        links['previous'] = {'href': self.get_previous_link()}
         result[LINKS_FIELD_NAME] = links
         result[EMBEDDED_FIELD_NAME] = {'items': data}
         return Response(result)
