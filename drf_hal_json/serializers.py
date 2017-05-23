@@ -25,18 +25,18 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         resp = defaultdict(dict)
 
         for field_name in self.link_field_names:
-            resp['_links'][field_name] = {'href': ret.pop(field_name)}
+            resp[LINKS_FIELD_NAME][field_name] = {'href': ret.pop(field_name)}
 
         for field_name in self.embedded_field_names:
             try:
                 # if a related resource is embedded, it should still
                 # get a link in the parent object
-                embed_self = ret[field_name].get('_links', {}).get('self')
+                embed_self = ret[field_name].get(LINKS_FIELD_NAME, {}).get(URL_FIELD_NAME)
                 if embed_self:
-                    resp['_links'][field_name] = embed_self
+                    resp[LINKS_FIELD_NAME][field_name] = embed_self
             except AttributeError:
                 pass
-            resp['_embedded'][field_name] = ret.pop(field_name)
+            resp[EMBEDDED_FIELD_NAME][field_name] = ret.pop(field_name)
 
         resp = {**resp, **ret}
         return resp
