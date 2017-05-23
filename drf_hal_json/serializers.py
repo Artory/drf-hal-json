@@ -13,7 +13,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
     Serializer for HAL representation of django models
     """
     serializer_related_field = HyperlinkedRelatedField
-    
+
     def __init__(self, instance=None, data=empty, **kwargs):
         super(HalModelSerializer, self).__init__(instance, data, **kwargs)
         self.nested_serializer_class = self.__class__
@@ -46,7 +46,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
 
         self.embedded_field_names = []
         self.link_field_names = []
-                
+
         for field_name, field in fields.items():
             if self._is_link_field(field):
                 self.link_field_names.append(field_name)
