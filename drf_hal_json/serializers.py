@@ -31,7 +31,9 @@ class HalModelSerializer(HyperlinkedModelSerializer):
             try:
                 # if a related resource is embedded, it should still
                 # get a link in the parent object
-                embed_self = ret[field_name].get(LINKS_FIELD_NAME, {}).get(URL_FIELD_NAME)
+                embed_self = ret[field_name].get(
+                    LINKS_FIELD_NAME,
+                    {}).get(URL_FIELD_NAME)
                 if embed_self:
                     resp[LINKS_FIELD_NAME][field_name] = embed_self
             except AttributeError:
