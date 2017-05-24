@@ -24,5 +24,9 @@ install:  ## Install build dependencies (prerequisite for build)
 test: install  ## Run tests
 	@cd tests && python manage.py test $(test_method)
 
+test-ci:  ## Run tests
+	pip install $(requirements)
+	@cd tests && python manage.py test $(test_method)
+
 help:
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-25s\033[0m %s\n", $$1, $$2}'
