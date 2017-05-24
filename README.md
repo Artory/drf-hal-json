@@ -15,15 +15,17 @@ Extension for Django REST Framework 3 which allows for using content-type applic
         'URL_FIELD_NAME': 'self',
     }
 
-## Requirement ##
+## Requirements ##
 
-* Python 2.7+
-* Django 1.6+
+* Python 3+
+* Django 1.11+
 * Django REST Framework 3
 
 ## Features ##
 
 By using the **HalModelSerializer** the content is serialized in the HAL JSON format.
+
+Pagination is supported and will produce `next` and `previous` links.
 
 ## Example ##
 
@@ -61,3 +63,11 @@ Request:
             }
         }
     }
+
+## Contributing
+
+Run tests:
+
+```
+$> make test
+```
