@@ -2,6 +2,12 @@ drf-hal-json
 =================
 Extension for Django REST Framework 3 which allows for using content-type application/hal-json. 
 
+## Status ##
+
+This fork of https://github.com/seebass/drf-hal-json is under active development. 
+As soon as there is a stable version ready, we'll do a merge and push a PyPI package.
+Until then this should not be considered stable.
+
 ## Setup ##
 
     pip install drf-hal-json
