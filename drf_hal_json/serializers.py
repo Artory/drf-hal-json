@@ -40,7 +40,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
                 pass
             resp[EMBEDDED_FIELD_NAME][field_name] = ret.pop(field_name)
 
-        resp = {**resp, **ret}
+        resp = dict(resp, **ret)
         return resp
 
     def get_fields(self):
