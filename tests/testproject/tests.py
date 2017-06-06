@@ -78,7 +78,6 @@ class HalTest(TestCase):
             self.TESTSERVER_URL + reverse('relatedresource1-detail', kwargs={'pk': self.nested_related_resource_1_2.id}),
             nested_related_resources_data[1][LINKS_FIELD_NAME]['self']['href'])
 
-    # Test that fails due to failure to hand lookup_field properly
     def test_custom_lookup_field(self):
         resp = self.client.get("/custom-resource/")
         custom_resource_links = resp.data[0][LINKS_FIELD_NAME]
