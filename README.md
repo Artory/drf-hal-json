@@ -23,7 +23,7 @@ Until then this should not be considered stable.
 
 ## Requirements ##
 
-* Python 3+
+* Python 3.4+
 * Django 1.11+
 * Django REST Framework 3
 
