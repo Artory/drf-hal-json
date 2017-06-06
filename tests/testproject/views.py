@@ -1,8 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 
 from drf_hal_json.views import HalCreateModelMixin
-from .models import CustomResource, TestResource, RelatedResource2, RelatedResource1, RelatedResource3
-from .serializers import CustomResourceSerializer, TestResourceSerializer, \
+from .models import AbundantResource, CustomResource, TestResource, RelatedResource2, RelatedResource1, RelatedResource3
+from .serializers import AbundantResourceSerializer, CustomResourceSerializer, TestResourceSerializer, \
     RelatedResource1Serializer, RelatedResource2Serializer, RelatedResource3Serializer
 
 
@@ -30,3 +30,8 @@ class RelatedResource3ViewSet(HalCreateModelMixin, ModelViewSet):
     serializer_class = RelatedResource3Serializer
     queryset = RelatedResource3.objects.all()
     lookup_field = 'name'
+
+
+class AbundantResourceViewSet(HalCreateModelMixin, ModelViewSet):
+    serializer_class = AbundantResourceSerializer
+    queryset = AbundantResource.objects.all()

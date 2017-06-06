@@ -34,8 +34,9 @@ MIDDLEWARE_CLASSES = (
 )
 
 REST_FRAMEWORK = {
+    'PAGE_SIZE': 10,
     'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.AllowAny'],
-    'DEFAULT_PAGINATION_CLASS': 'drf_hal_json.pagination.HalPageNumberPagination',
+    'DEFAULT_PAGINATION_CLASS': 'drf_hal_json.pagination.HalCursorPagination',
     'DEFAULT_PARSER_CLASSES': ('drf_hal_json.parsers.JsonHalParser',),
     'DEFAULT_RENDERER_CLASSES': ('drf_hal_json.renderers.JsonHalRenderer',),
     'URL_FIELD_NAME': 'self',

@@ -2,7 +2,7 @@ from django.test import TestCase
 from rest_framework.reverse import reverse
 
 from drf_hal_json import LINKS_FIELD_NAME, EMBEDDED_FIELD_NAME
-from .models import CustomResource, TestResource, RelatedResource1, RelatedResource2, RelatedResource3
+from .models import AbundantResource, CustomResource, TestResource, RelatedResource1, RelatedResource2, RelatedResource3
 
 
 class HalTest(TestCase):
@@ -19,19 +19,21 @@ class HalTest(TestCase):
         self.related_resource_3 = RelatedResource3.objects.create(name="Related-Resource3")
         self.custom_resource_1 = CustomResource.objects.create(name="Custom-Resource", related_resource_3=self.related_resource_3)
 
+        for i in range(0, 50):
+            AbundantResource.objects.create(name="Abundant Resource {}".format(i))
+
     def test_basic_data(self):
-        resp = self.client.get("/test-resources/")
+        resp = self.client.get("/test-resources/1/")
         self.assertEqual(200, resp.status_code, resp.content)
-        self.assertEqual(1, len(resp.data))
-        test_resource_data = resp.data[0]
+        test_resource_data = resp.data
         self.assertEqual(4, len(test_resource_data))
         self.assertEqual(self.test_resource_1.id, test_resource_data['id'])
         self.assertEqual(self.test_resource_1.name, test_resource_data['name'])
 
     def test_links(self):
-        resp = self.client.get("/test-resources/")
+        resp = self.client.get("/test-resources/1/")
 
-        test_resource_links = resp.data[0][LINKS_FIELD_NAME]
+        test_resource_links = resp.data[LINKS_FIELD_NAME]
         self.assertEqual(3, len(test_resource_links))
         self.assertEqual(self.TESTSERVER_URL + reverse('testresource-detail', kwargs={'pk': self.test_resource_1.id}),
                          test_resource_links['self']['href'])
@@ -41,15 +43,15 @@ class HalTest(TestCase):
                          test_resource_links['related_resource_2']['href'])
 
     def test_embedded_resource_data(self):
-        resp = self.client.get("/test-resources/")
-        test_resource_data = resp.data[0]
+        resp = self.client.get("/test-resources/1/")
+        test_resource_data = resp.data
         related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
         self.assertEqual(5, len(related_resource_2_data))
         self.assertEqual(self.related_resource_2.name, related_resource_2_data['name'])
 
     def test_embedded_resource_links(self):
-        resp = self.client.get("/test-resources/")
-        test_resource_data = resp.data[0]
+        resp = self.client.get("/test-resources/1/")
+        test_resource_data = resp.data
         related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
         related_resource_2_links = related_resource_2_data[LINKS_FIELD_NAME]
         self.assertEqual(1, len(related_resource_2_links))
@@ -57,8 +59,8 @@ class HalTest(TestCase):
                          related_resource_2_links['self']['href'])
 
     def test_deep_embedding(self):
-        resp = self.client.get("/test-resources/")
-        test_resource_data = resp.data[0]
+        resp = self.client.get("/test-resources/1/")
+        test_resource_data = resp.data
         related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
         related_resource_2_links = related_resource_2_data[LINKS_FIELD_NAME]
         related_resource_2_embedded = related_resource_2_data[EMBEDDED_FIELD_NAME]
@@ -79,10 +81,14 @@ class HalTest(TestCase):
             nested_related_resources_data[1][LINKS_FIELD_NAME]['self']['href'])
 
     def test_custom_lookup_field(self):
-        resp = self.client.get("/custom-resource/")
-        custom_resource_links = resp.data[0][LINKS_FIELD_NAME]
+        resp = self.client.get("/custom-resources/1/")
+        custom_resource_links = resp.data[LINKS_FIELD_NAME]
         self.assertEqual(2, len(custom_resource_links))
         self.assertEqual(self.TESTSERVER_URL + reverse('customresource-detail', kwargs={'pk': self.custom_resource_1.id}),
                          custom_resource_links['self']['href'])
         self.assertEqual(self.TESTSERVER_URL + reverse('relatedresource3-detail', kwargs={'name': self.custom_resource_1.name}),
                          custom_resource_links['related_resource_3']['href'])
+
+    # def test_pagination(self):
+    #     resp = self.client.get("/related-resources-1/")
+

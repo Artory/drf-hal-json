@@ -1,7 +1,7 @@
 from drf_hal_json.serializers import HalModelSerializer
 from rest_framework import serializers
 
-from .models import CustomResource, TestResource, RelatedResource1, RelatedResource2, RelatedResource3
+from .models import AbundantResource, CustomResource, TestResource, RelatedResource1, RelatedResource2, RelatedResource3
 
 
 class RelatedResource1Serializer(HalModelSerializer):
@@ -41,3 +41,8 @@ class CustomResourceSerializer(HalModelSerializer):
     class Meta:
         model = CustomResource
         fields = ('self', 'name', 'related_resource_3')
+
+
+class AbundantResourceSerializer(HalModelSerializer):
+    class Meta:
+        model = AbundantResource
