@@ -70,6 +70,8 @@ Request:
         }
     }
 
+See the [test project][] for a complete Django project with more examples. 
+
 ## Contributing
 
 Run tests:
@@ -77,3 +79,5 @@ Run tests:
 ```
 $> make test
 ```
+
+[test project]: tests/
