@@ -84,11 +84,25 @@ class HalTest(TestCase):
         resp = self.client.get("/custom-resources/1/")
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
         self.assertEqual(2, len(custom_resource_links))
-        self.assertEqual(self.TESTSERVER_URL + reverse('customresource-detail', kwargs={'pk': self.custom_resource_1.id}),
-                         custom_resource_links['self']['href'])
-        self.assertEqual(self.TESTSERVER_URL + reverse('relatedresource3-detail', kwargs={'name': self.custom_resource_1.name}),
-                         custom_resource_links['related_resource_3']['href'])
+        self.assertEqual(self.TESTSERVER_URL + reverse("customresource-detail", kwargs={"pk": self.custom_resource_1.id}),
+                         custom_resource_links["self"]["href"])
+        self.assertEqual(self.TESTSERVER_URL + reverse("relatedresource3-detail", kwargs={"name": self.custom_resource_1.name}),
+                         custom_resource_links["related_resource_3"]["href"])
 
-    # def test_pagination(self):
-    #     resp = self.client.get("/related-resources-1/")
+    def test_pagination(self):
+        no_pages = self.client.get("/test-resources/").data
+        self.assertIn("self", no_pages["_links"])
+        self.assertNotIn("previous", no_pages["_links"])
+        self.assertNotIn("next", no_pages["_links"])
+
+        pages = self.client.get("/abundant-resources/").data
+        self.assertIn("self", pages["_links"])
+        self.assertNotIn("previous", pages["_links"])
+        self.assertIn("next", pages["_links"])
+        next_link = pages["_links"]["next"]["href"]
+
+        pages = self.client.get(next_link).data
+        self.assertIn("self", pages["_links"])
+        self.assertIn("previous", pages["_links"])
+        self.assertIn("next", pages["_links"])
 

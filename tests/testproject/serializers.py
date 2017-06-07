@@ -46,3 +46,4 @@ class CustomResourceSerializer(HalModelSerializer):
 class AbundantResourceSerializer(HalModelSerializer):
     class Meta:
         model = AbundantResource
+        fields = ('self', 'name')
