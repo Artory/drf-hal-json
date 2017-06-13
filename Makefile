@@ -25,7 +25,6 @@ test: install  ## Run tests
 	@cd tests && python manage.py test $(test_method)
 
 test-ci:  ## Run tests
-	pip install $(requirements)
 	@cd tests && python manage.py test $(test_method)
 
 help:

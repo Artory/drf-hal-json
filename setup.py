@@ -4,15 +4,15 @@ from setuptools import setup, find_packages
 setup(
     name='drf-hal-json',
     version="0.9.1",
-    url='https://github.com/seebass/drf-hal-json',
+    url='https://github.com/Artory/drf-hal-json',
     license='MIT',
     description='Extension for Django REST Framework 3 which allows for using content-type application/hal-json',
     author='Sebastian Bredehöft',
     author_email='bredehoeft.sebastian@gmail.com',
     packages=find_packages(exclude=['tests*']),
     install_requires=[
-        'django>=1.6',
-        'djangorestframework>=3.0.0'
+        'django>=1.11',
+        'djangorestframework>=3.6.0'
     ],
     zip_safe=False,
     classifiers=[
