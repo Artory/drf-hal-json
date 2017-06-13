@@ -25,7 +25,9 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         resp = defaultdict(dict)
 
         for field_name in self.link_field_names:
-            resp[LINKS_FIELD_NAME][field_name] = {'href': ret.pop(field_name)}
+            val = ret.pop(field_name)
+            if val is not None:
+                resp[LINKS_FIELD_NAME][field_name] = {'href': val}
 
         for field_name in self.embedded_field_names:
             try:

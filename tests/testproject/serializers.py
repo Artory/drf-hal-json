@@ -37,10 +37,12 @@ class RelatedResource3Serializer(HalModelSerializer):
 class CustomResourceSerializer(HalModelSerializer):
     related_resource_3 = serializers.HyperlinkedIdentityField(
         read_only=True, view_name='relatedresource3-detail', lookup_field='name')
+    some_id = serializers.HyperlinkedRelatedField(
+        read_only=True, view_name='relatedresource3-detail')
 
     class Meta:
         model = CustomResource
-        fields = ('self', 'name', 'related_resource_3')
+        fields = ('self', 'name', 'related_resource_3', 'some_id')
 
 
 class AbundantResourceSerializer(HalModelSerializer):

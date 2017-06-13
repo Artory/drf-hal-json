@@ -32,6 +32,11 @@ class CustomResource(models.Model):
     related_resource_3 = models.ForeignKey(RelatedResource3)
     name = models.CharField(max_length=255)
 
+    @property
+    def some_id(self):
+        return None
+
+
 
 class AbundantResource(models.Model):
     created = models.DateTimeField(auto_now=True)
