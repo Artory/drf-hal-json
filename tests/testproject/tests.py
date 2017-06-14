@@ -17,7 +17,9 @@ class HalTest(TestCase):
         self.test_resource_1 = TestResource.objects.create(name="Test-Resource", related_resource_1=self.related_resource_1,
                                                            related_resource_2=self.related_resource_2)
         self.related_resource_3 = RelatedResource3.objects.create(name="Related-Resource3")
-        self.custom_resource_1 = CustomResource.objects.create(name="Custom-Resource", related_resource_3=self.related_resource_3)
+        self.custom_resource_1 = CustomResource.objects.create(name="Custom-Resource-1", related_resource_3=self.related_resource_3)
+        self.custom_resource_2 = CustomResource.objects.create(name="Custom-Resource-2", related_resource_3=self.related_resource_3,
+                                                               related_resource_2=self.related_resource_2)
 
         for i in range(0, 50):
             AbundantResource.objects.create(name="Abundant Resource {}".format(i))
@@ -106,3 +108,11 @@ class HalTest(TestCase):
         self.assertIn("previous", pages["_links"])
         self.assertIn("next", pages["_links"])
 
+    def test_empty_relation(self):
+        resp = self.client.get("/custom-resources/1/")
+        custom_resource_links = resp.data[LINKS_FIELD_NAME]
+        self.assertNotIn("related_resource_2", custom_resource_links)
+
+        resp = self.client.get("/custom-resources/2/")
+        custom_resource_links = resp.data[LINKS_FIELD_NAME]
+        self.assertIn("related_resource_2", custom_resource_links)
