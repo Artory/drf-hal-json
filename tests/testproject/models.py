@@ -29,13 +29,9 @@ class TestResource(models.Model):
 
 class CustomResource(models.Model):
     created = models.DateTimeField(auto_now=True)
+    related_resource_2 = models.ForeignKey(RelatedResource2, null=True, default=None)
     related_resource_3 = models.ForeignKey(RelatedResource3)
     name = models.CharField(max_length=255)
-
-    @property
-    def some_id(self):
-        return None
-
 
 
 class AbundantResource(models.Model):
