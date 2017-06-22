@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from rest_framework.fields import empty
 from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, ManyRelatedField, RelatedField
 from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer
@@ -20,7 +22,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
 
     def to_representation(self, instance):
         ret = super().to_representation(instance)
-        resp = collections.defaultdict(dict)
+        resp = defaultdict(dict)
 
         for field_name in self.link_field_names:
             val = ret.pop(field_name)
