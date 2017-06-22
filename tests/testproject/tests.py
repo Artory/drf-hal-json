@@ -56,9 +56,16 @@ class HalTest(TestCase):
         test_resource_data = resp.data
         related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
         related_resource_2_links = related_resource_2_data[LINKS_FIELD_NAME]
-        self.assertEqual(1, len(related_resource_2_links))
+        self.assertEqual(2, len(related_resource_2_links))
         self.assertEqual(self.TESTSERVER_URL + reverse('relatedresource2-detail', kwargs={'pk': self.related_resource_2.id}),
                          related_resource_2_links['self']['href'])
+
+    def test_link_titles(self):
+        resp = self.client.get("/related-resources-2/1/")
+        related = resp.data[LINKS_FIELD_NAME]['related_resources_1']
+        self.assertEqual(2, len(related))
+        self.assertEqual('some title', related[0]['title'])
+        self.assertEqual('some title', related[1]['title'])
 
     def test_deep_embedding(self):
         resp = self.client.get("/test-resources/1/")
