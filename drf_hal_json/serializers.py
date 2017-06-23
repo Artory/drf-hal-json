@@ -51,7 +51,15 @@ class HalModelSerializer(HyperlinkedModelSerializer):
             except AttributeError:
                 pass
 
-            resp[EMBEDDED_FIELD_NAME][field_name] = ret.pop(field_name)
+            try:
+                embed = field_name in self.Meta.hal_embedded_fields
+            except AttributeError:
+                embed = False
+
+            if embed:
+                resp[EMBEDDED_FIELD_NAME][field_name] = ret.pop(field_name)
+            else:
+                ret.pop(field_name)
 
         resp = dict(resp, **ret)
         return resp

@@ -18,6 +18,7 @@ class RelatedResource2Serializer(HalModelSerializer):
     class Meta:
         model = RelatedResource2
         fields = ('self', 'id', 'name', 'active', 'related_resources_1')
+        hal_embedded_fields = ('related_resources_1')
 
 
 class TestResourceSerializer(HalModelSerializer):
@@ -27,6 +28,7 @@ class TestResourceSerializer(HalModelSerializer):
     class Meta:
         model = TestResource
         fields = ('self', 'id', 'name', 'related_resource_1', 'related_resource_2')
+        hal_embedded_fields = ('related_resource_2')
 
 
 class RelatedResource3Serializer(HalModelSerializer):

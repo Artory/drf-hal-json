@@ -28,6 +28,7 @@ class HalTest(TestCase):
         resp = self.client.get("/test-resources/1/")
         self.assertEqual(200, resp.status_code, resp.content)
         test_resource_data = resp.data
+        import pdb; pdb.set_trace()
         self.assertEqual(4, len(test_resource_data))
         self.assertEqual(self.test_resource_1.id, test_resource_data['id'])
         self.assertEqual(self.test_resource_1.name, test_resource_data['name'])
