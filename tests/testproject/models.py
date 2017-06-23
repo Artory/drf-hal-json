@@ -38,3 +38,6 @@ class AbundantResource(models.Model):
     created = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=255)
 
+
+class URLResource(models.Model):
+    url = models.CharField(max_length=255)

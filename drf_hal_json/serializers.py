@@ -1,10 +1,14 @@
 from collections import defaultdict
-from rest_framework.fields import empty
-from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, ManyRelatedField, RelatedField
-from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer
-from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 
-from drf_hal_json import URL_FIELD_NAME, EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME
+from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
+from drf_hal_json.fields import HyperlinkedPropertyField
+from rest_framework.fields import empty
+from rest_framework.relations import (HyperlinkedIdentityField,
+                                      HyperlinkedRelatedField,
+                                      ManyRelatedField, RelatedField)
+from rest_framework.serializers import (BaseSerializer,
+                                        HyperlinkedModelSerializer)
+from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 
 
 class HalModelSerializer(HyperlinkedModelSerializer):
@@ -59,8 +63,10 @@ class HalModelSerializer(HyperlinkedModelSerializer):
 
     @staticmethod
     def _is_link_field(field):
-        return isinstance(field, RelatedField) or isinstance(field, ManyRelatedField) \
-               or isinstance(field, HyperlinkedIdentityField)
+        return (isinstance(field, RelatedField) or
+                isinstance(field, ManyRelatedField) or
+                isinstance(field, HyperlinkedIdentityField) or
+                isinstance(field, HyperlinkedPropertyField))
 
     @staticmethod
     def _is_embedded_field(field):

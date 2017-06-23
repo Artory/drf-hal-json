@@ -1,8 +1,10 @@
 from django.test import TestCase
+from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME
 from rest_framework.reverse import reverse
 
-from drf_hal_json import LINKS_FIELD_NAME, EMBEDDED_FIELD_NAME
-from .models import AbundantResource, CustomResource, TestResource, RelatedResource1, RelatedResource2, RelatedResource3
+from .models import (AbundantResource, CustomResource, RelatedResource1,
+                     RelatedResource2, RelatedResource3, TestResource,
+                     URLResource)
 
 
 class HalTest(TestCase):
@@ -20,6 +22,7 @@ class HalTest(TestCase):
         self.custom_resource_1 = CustomResource.objects.create(name="Custom-Resource-1", related_resource_3=self.related_resource_3)
         self.custom_resource_2 = CustomResource.objects.create(name="Custom-Resource-2", related_resource_3=self.related_resource_3,
                                                                related_resource_2=self.related_resource_2)
+        self.url_resource = URLResource.objects.create(url="https://www.example.com/")
 
         for i in range(0, 50):
             AbundantResource.objects.create(name="Abundant Resource {}".format(i))
@@ -90,6 +93,14 @@ class HalTest(TestCase):
                          custom_resource_links["self"]["href"])
         self.assertEqual(self.TESTSERVER_URL + reverse("relatedresource3-detail", kwargs={"name": self.custom_resource_1.name}),
                          custom_resource_links["related_resource_3"]["href"])
+
+    def test_hypelinked_property_field(self):
+        resp = self.client.get("/url-resources/1/")
+        custom_resource_links = resp.data[LINKS_FIELD_NAME]
+        self.assertEqual('https://www.example.com/',
+                         custom_resource_links["url"]["href"])
+        self.assertEqual('https://www.example.com/?foo=bar',
+                         custom_resource_links["url_processed"]["href"])
 
     def test_pagination(self):
         no_pages = self.client.get("/test-resources/").data

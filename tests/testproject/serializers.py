@@ -1,7 +1,10 @@
+from drf_hal_json.fields import HyperlinkedPropertyField
 from drf_hal_json.serializers import HalModelSerializer
 from rest_framework import serializers
 
-from .models import AbundantResource, CustomResource, TestResource, RelatedResource1, RelatedResource2, RelatedResource3
+from .models import (AbundantResource, CustomResource, RelatedResource1,
+                     RelatedResource2, RelatedResource3, TestResource,
+                     URLResource)
 
 
 class RelatedResource1Serializer(HalModelSerializer):
@@ -48,3 +51,14 @@ class AbundantResourceSerializer(HalModelSerializer):
     class Meta:
         model = AbundantResource
         fields = ('self', 'name')
+
+
+class HyperlinkedPropertySerializer(HalModelSerializer):
+    url = HyperlinkedPropertyField()
+    url_processed = HyperlinkedPropertyField(
+        source='url',
+        process_value=lambda val: val + '?foo=bar')
+
+    class Meta:
+        model = URLResource
+        fields = ('self', 'url', 'url_processed')

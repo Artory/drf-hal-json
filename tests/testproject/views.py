@@ -1,9 +1,14 @@
+from drf_hal_json.views import HalCreateModelMixin
 from rest_framework.viewsets import ModelViewSet
 
-from drf_hal_json.views import HalCreateModelMixin
-from .models import AbundantResource, CustomResource, TestResource, RelatedResource2, RelatedResource1, RelatedResource3
-from .serializers import AbundantResourceSerializer, CustomResourceSerializer, TestResourceSerializer, \
-    RelatedResource1Serializer, RelatedResource2Serializer, RelatedResource3Serializer
+from .models import (AbundantResource, CustomResource, RelatedResource1,
+                     RelatedResource2, RelatedResource3, TestResource,
+                     URLResource)
+from .serializers import (AbundantResourceSerializer, CustomResourceSerializer,
+                          HyperlinkedPropertySerializer,
+                          RelatedResource1Serializer,
+                          RelatedResource2Serializer,
+                          RelatedResource3Serializer, TestResourceSerializer)
 
 
 class CustomResourceViewSet(HalCreateModelMixin, ModelViewSet):
@@ -35,3 +40,8 @@ class RelatedResource3ViewSet(HalCreateModelMixin, ModelViewSet):
 class AbundantResourceViewSet(HalCreateModelMixin, ModelViewSet):
     serializer_class = AbundantResourceSerializer
     queryset = AbundantResource.objects.all()
+
+
+class URLResourceViewSet(HalCreateModelMixin, ModelViewSet):
+    serializer_class = HyperlinkedPropertySerializer
+    queryset = URLResource.objects.all()
