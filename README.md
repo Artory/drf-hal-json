@@ -74,9 +74,9 @@ Request:
     
 ### Link titles
 
-The optional `title` attribute is supported for link relations. If a serializer includes a field called
-`title`, it will not be serialized as part of the object itself. Instead, the `title` field enhances
-the link relation of the object.
+The [optional `title` attribute][hal spec title] is supported for link relations. If a serializer 
+includes a field called `_link_title`, it will not be serialized as part of the object itself. 
+Instead, the field labels the link relation of the object.
 
 See the [test project][] for a complete Django project with more examples. 
 
@@ -89,3 +89,4 @@ $> make test
 ```
 
 [test project]: tests/
+[hal spec title]: https://tools.ietf.org/html/draft-kelly-json-hal-06#section-5.7
