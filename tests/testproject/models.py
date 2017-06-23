@@ -6,10 +6,6 @@ class RelatedResource1(models.Model):
     name = models.CharField(max_length=255)
     active = models.BooleanField(default=True)
 
-    @property
-    def title(self):
-        return 'some title'
-
 
 class RelatedResource2(models.Model):
     created = models.DateTimeField(auto_now=True)
