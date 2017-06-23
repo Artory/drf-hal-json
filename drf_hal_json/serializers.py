@@ -1,5 +1,4 @@
 from collections import defaultdict
-
 from rest_framework.fields import empty
 from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, ManyRelatedField, RelatedField
 from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer
