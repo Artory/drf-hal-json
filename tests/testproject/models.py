@@ -7,7 +7,7 @@ class RelatedResource1(models.Model):
     active = models.BooleanField(default=True)
 
     @property
-    def title(self):
+    def _link_title(self):
         return 'some title'
 
 

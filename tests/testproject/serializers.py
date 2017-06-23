@@ -10,7 +10,7 @@ from .models import (AbundantResource, CustomResource, RelatedResource1,
 class RelatedResource1Serializer(HalModelSerializer):
     class Meta:
         model = RelatedResource1
-        fields = ('self', 'title', 'id', 'name', 'active')
+        fields = ('self', '_link_title', 'id', 'name', 'active')
 
 
 class RelatedResource2Serializer(HalModelSerializer):

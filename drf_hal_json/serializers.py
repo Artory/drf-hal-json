@@ -31,8 +31,8 @@ class HalModelSerializer(HyperlinkedModelSerializer):
             val = ret.pop(field_name)
             if val is not None:
                 rel = {'href': val}
-                if 'title' in ret:
-                    rel['title'] = ret.pop('title')
+                if '_link_title' in ret:
+                    rel['title'] = ret.pop('_link_title')
                 resp[LINKS_FIELD_NAME][field_name] = rel
 
 
