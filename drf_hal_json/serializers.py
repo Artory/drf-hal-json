@@ -23,6 +23,13 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         if data != empty and not LINKS_FIELD_NAME in data:
             data[LINKS_FIELD_NAME] = dict()  # put links in data, so that field validation does not fail
 
+    def build_link_object(self, val):
+        if (type([]) == type(val)):
+            return [self.build_link_object(v) for v in val]
+        if isinstance(val, dict) and val.get('href', False):
+            return val
+        return {'href': val}
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         resp = defaultdict(dict)
@@ -30,11 +37,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         for field_name in self.link_field_names:
             val = ret.pop(field_name)
             if val is not None:
-                rel = {'href': val}
-                if '_link_title' in ret:
-                    rel['title'] = ret.pop('_link_title')
-                resp[LINKS_FIELD_NAME][field_name] = rel
-
+                resp[LINKS_FIELD_NAME][field_name] = self.build_link_object(val)
 
         for field_name in self.embedded_field_names:
             # if a related resource is embedded, it should still
