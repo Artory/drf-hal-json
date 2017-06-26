@@ -1,10 +1,10 @@
 from collections import defaultdict
+
+from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
 from rest_framework.fields import empty
 from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, ManyRelatedField, RelatedField
 from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer
 from rest_framework.utils.field_mapping import get_nested_relation_kwargs
-
-from drf_hal_json import URL_FIELD_NAME, EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME
 
 
 class HalModelSerializer(HyperlinkedModelSerializer):
@@ -19,6 +19,12 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         if data != empty and not LINKS_FIELD_NAME in data:
             data[LINKS_FIELD_NAME] = dict()  # put links in data, so that field validation does not fail
 
+    def _get_url(self, item):
+        try:
+            return item.get(LINKS_FIELD_NAME, {}).get(URL_FIELD_NAME)
+        except AttributeError:
+            return None
+
     def to_representation(self, instance):
         ret = super().to_representation(instance)
         resp = defaultdict(dict)
@@ -31,26 +37,15 @@ class HalModelSerializer(HyperlinkedModelSerializer):
                     rel['title'] = ret.pop('_link_title')
                 resp[LINKS_FIELD_NAME][field_name] = rel
 
-
         for field_name in self.embedded_field_names:
             # if a related resource is embedded, it should still
             # get a link in the parent object
-            try:
-                if type([]) == type(ret[field_name]):
-                    resp[LINKS_FIELD_NAME][field_name] = []
-                    for item in ret[field_name]:
-                        embed_self = item.get(LINKS_FIELD_NAME, {}).get(URL_FIELD_NAME)
-                        if embed_self:
-                            resp[LINKS_FIELD_NAME][field_name].append(embed_self)
-                else:
-                    embed_self = ret[field_name].get(
-                        LINKS_FIELD_NAME,
-                        {}).get(URL_FIELD_NAME)
-                    if embed_self:
-                        resp[LINKS_FIELD_NAME][field_name] = embed_self
-            except AttributeError:
-                pass
-
+            if type(ret[field_name]) == list:
+                embed_self = [self._get_url(x) for x in ret[field_name] if x]
+            else:
+                embed_self = self._get_url(ret[field_name])
+            if embed_self:
+                resp[LINKS_FIELD_NAME][field_name] = embed_self
             resp[EMBEDDED_FIELD_NAME][field_name] = ret.pop(field_name)
 
         resp = dict(resp, **ret)
