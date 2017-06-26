@@ -4,7 +4,7 @@ from rest_framework import serializers
 
 from .models import (AbundantResource, CustomResource, RelatedResource1,
                      RelatedResource2, RelatedResource3, TestResource,
-                     URLResource)
+                     URLResource, FileResource)
 
 
 class RelatedResource1Serializer(HalModelSerializer):
@@ -62,3 +62,10 @@ class HyperlinkedPropertySerializer(HalModelSerializer):
     class Meta:
         model = URLResource
         fields = ('self', 'url', 'url_processed')
+
+
+class FileSerializer(HalModelSerializer):
+
+    class Meta:
+        model = FileResource
+        fields = ('self', 'file', 'image')

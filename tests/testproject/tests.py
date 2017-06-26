@@ -1,9 +1,10 @@
+from django.core.files.base import ContentFile
 from django.test import TestCase
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME
 from rest_framework.reverse import reverse
 
 from .models import (AbundantResource, CustomResource, RelatedResource1, RelatedResource2, RelatedResource3,
-                     TestResource, URLResource)
+                     TestResource, URLResource, FileResource)
 
 
 class HalTest(TestCase):
@@ -28,6 +29,9 @@ class HalTest(TestCase):
             related_resource_3=self.related_resource_3,
             related_resource_2=self.related_resource_2)
         self.url_resource = URLResource.objects.create(url="https://www.example.com/")
+        self.file_resource = FileResource()
+        self.file_resource.file.save('foo', ContentFile(b'bar'))
+        self.file_resource.image.save('image', ContentFile(b'JPEG'))
 
         for i in range(0, 50):
             AbundantResource.objects.create(name="Abundant Resource {}".format(i))
@@ -139,3 +143,9 @@ class HalTest(TestCase):
         resp = self.client.get("/custom-resources/2/")
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
         self.assertIn("related_resource_2", custom_resource_links)
+
+    def test_filefield_serialization(self):
+        resp = self.client.get("/file-resources/1/")
+        custom_resource_links = resp.data[LINKS_FIELD_NAME]
+        self.assertIn("file", custom_resource_links)
+        self.assertIn("image", custom_resource_links)

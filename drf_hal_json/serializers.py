@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
 from drf_hal_json.fields import HyperlinkedPropertyField
-from rest_framework.fields import empty
+from rest_framework.fields import empty, FileField, ImageField
 from rest_framework.relations import (HyperlinkedIdentityField,
                                       HyperlinkedRelatedField,
                                       ManyRelatedField, RelatedField)
@@ -66,7 +66,9 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         return (isinstance(field, RelatedField) or
                 isinstance(field, ManyRelatedField) or
                 isinstance(field, HyperlinkedIdentityField) or
-                isinstance(field, HyperlinkedPropertyField))
+                isinstance(field, HyperlinkedPropertyField) or
+                isinstance(field, FileField) or
+                isinstance(field, ImageField))
 
     @staticmethod
     def _is_embedded_field(field):

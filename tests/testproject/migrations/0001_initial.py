@@ -75,6 +75,14 @@ class Migration(migrations.Migration):
                 ('url', models.CharField(max_length=255)),
             ],
         ),
+        migrations.CreateModel(
+            name='FileResource',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('file', models.FileField(max_length=255)),
+                ('image', models.ImageField(max_length=255)),
+            ],
+        ),
         migrations.AddField(
             model_name='customresource',
             name='related_resource_2',
