@@ -94,7 +94,7 @@ class HalTest(TestCase):
         self.assertEqual(self.TESTSERVER_URL + reverse("relatedresource3-detail", kwargs={"name": self.custom_resource_1.name}),
                          custom_resource_links["related_resource_3"]["href"])
 
-    def test_hypelinked_property_field(self):
+    def test_hyperlinked_property_field(self):
         resp = self.client.get("/url-resources/1/")
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
         self.assertEqual('https://www.example.com/',
