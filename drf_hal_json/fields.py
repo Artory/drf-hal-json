@@ -16,3 +16,33 @@ class HyperlinkedPropertyField(serializers.Field):
 
     def to_internal_value(self, data):
         raise NotImplementedError()
+
+
+class HalHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
+
+    def __init__(self, **kwargs):
+        self.title_field = kwargs.pop('title_field', None)
+        super().__init__(**kwargs)
+
+    def to_representation(self, instance):
+        val = {'href': super().to_representation(instance)}
+
+        if self.title_field and getattr(instance, self.title_field):
+            val['title'] = getattr(instance, self.title_field)
+
+        return val
+
+
+class HalHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
+
+    def __init__(self, **kwargs):
+        self.title_field = kwargs.pop('title_field', None)
+        super().__init__(**kwargs)
+
+    def to_representation(self, instance):
+        val = {'href': super().to_representation(instance)}
+
+        if self.title_field and getattr(instance, self.title_field):
+            val['title'] = getattr(instance, self.title_field)
+
+        return val

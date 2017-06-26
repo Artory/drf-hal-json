@@ -58,7 +58,7 @@ class HalTest(TestCase):
         resp = self.client.get("/test-resources/1/")
         test_resource_data = resp.data
         related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
-        self.assertEqual(5, len(related_resource_2_data))
+        self.assertEqual(4, len(related_resource_2_data))
         self.assertEqual(self.related_resource_2.name, related_resource_2_data['name'])
 
     def test_embedded_resource_links(self):
@@ -66,34 +66,17 @@ class HalTest(TestCase):
         test_resource_data = resp.data
         related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
         related_resource_2_links = related_resource_2_data[LINKS_FIELD_NAME]
-        self.assertEqual(1, len(related_resource_2_links))
+        self.assertEqual(2, len(related_resource_2_links))
         self.assertEqual(
             self.TESTSERVER_URL + reverse('relatedresource2-detail', kwargs={'pk': self.related_resource_2.id}),
             related_resource_2_links['self']['href'])
 
-    def test_deep_embedding(self):
-        resp = self.client.get("/test-resources/1/")
-        test_resource_data = resp.data
-        related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
-        related_resource_2_links = related_resource_2_data[LINKS_FIELD_NAME]
-        related_resource_2_embedded = related_resource_2_data[EMBEDDED_FIELD_NAME]
-        self.assertEqual(1, len(related_resource_2_embedded))
-        nested_related_resources_data = related_resource_2_embedded['related_resources_1']
-        self.assertEqual(2, len(nested_related_resources_data))
-        self.assertEqual(4, len(nested_related_resources_data[0]))
-        self.assertEqual(4, len(nested_related_resources_data[1]))
-        self.assertEqual(self.nested_related_resource_1_1.id, nested_related_resources_data[0]['id'])
-        self.assertEqual(self.nested_related_resource_1_1.name, nested_related_resources_data[0]['name'])
-        self.assertEqual(
-            self.TESTSERVER_URL +
-            reverse('relatedresource1-detail', kwargs={'pk': self.nested_related_resource_1_1.id}),
-            nested_related_resources_data[0][LINKS_FIELD_NAME]['self']['href'])
-        self.assertEqual(self.nested_related_resource_1_2.id, nested_related_resources_data[1]['id'])
-        self.assertEqual(self.nested_related_resource_1_2.name, nested_related_resources_data[1]['name'])
-        self.assertEqual(
-            self.TESTSERVER_URL +
-            reverse('relatedresource1-detail', kwargs={'pk': self.nested_related_resource_1_2.id}),
-            nested_related_resources_data[1][LINKS_FIELD_NAME]['self']['href'])
+    def test_link_titles(self):
+        resp = self.client.get("/related-resources-2/1/")
+        related = resp.data[LINKS_FIELD_NAME]['related_resources_1']
+        self.assertEqual(2, len(related))
+        self.assertEqual('Nested-Related-Resource11', related[0]['title'])
+        self.assertEqual('Nested-Related-Resource12', related[1]['title'])
 
     def test_custom_lookup_field(self):
         resp = self.client.get("/custom-resources/1/")
@@ -105,6 +88,8 @@ class HalTest(TestCase):
         self.assertEqual(
             self.TESTSERVER_URL + reverse("relatedresource3-detail", kwargs={"name": self.custom_resource_1.name}),
             custom_resource_links["related_resource_3"]["href"])
+        self.assertEqual(self.custom_resource_1.name,
+                         custom_resource_links["related_resource_3"]["title"])
 
     def test_hyperlinked_property_field(self):
         resp = self.client.get("/url-resources/1/")
