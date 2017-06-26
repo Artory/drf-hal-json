@@ -75,8 +75,8 @@ class HalTest(TestCase):
         resp = self.client.get("/related-resources-2/1/")
         related = resp.data[LINKS_FIELD_NAME]['related_resources_1']
         self.assertEqual(2, len(related))
-        # self.assertEqual('some title', related[0]['title'])
-        # self.assertEqual('some title', related[1]['title'])
+        self.assertEqual('Nested-Related-Resource11', related[0]['title'])
+        self.assertEqual('Nested-Related-Resource12', related[1]['title'])
 
     def test_custom_lookup_field(self):
         resp = self.client.get("/custom-resources/1/")
