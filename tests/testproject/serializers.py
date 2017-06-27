@@ -1,5 +1,6 @@
 from drf_hal_json.fields import HyperlinkedPropertyField, ContributeTitleField
 from drf_hal_json.serializers import HalModelSerializer
+from drf_hal_json.fields import HalHyperlinkedRelatedField, HalHyperlinkedIdentityField
 from rest_framework import serializers
 
 from .models import (AbundantResource, CustomResource, RelatedResource1,
@@ -14,9 +15,9 @@ class RelatedResource1Serializer(HalModelSerializer):
 
 
 class RelatedResource2Serializer(HalModelSerializer):
-    # use nested serializer to control what fields are in the serialized, nested object
-    # (specifically we want 'id' to be included, which is not the default)
-    related_resources_1 = RelatedResource1Serializer(read_only=True, many=True)
+    # related_resources_1 are not embedded, just linked
+    related_resources_1 = HalHyperlinkedRelatedField(
+        many=True, read_only=True, view_name='relatedresource1-detail', title_field='name')
 
     class Meta:
         model = RelatedResource2
@@ -39,8 +40,9 @@ class RelatedResource3Serializer(HalModelSerializer):
 
 class CustomResourceSerializer(HalModelSerializer):
     related_resource_2 = RelatedResource2Serializer(read_only=True)
-    related_resource_3 = serializers.HyperlinkedIdentityField(
-        read_only=True, view_name='relatedresource3-detail', lookup_field='name')
+    related_resource_3 = HalHyperlinkedIdentityField(
+        read_only=True, view_name='relatedresource3-detail', lookup_field='name',
+        title_field='name')
 
     class Meta:
         model = CustomResource

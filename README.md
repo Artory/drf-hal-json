@@ -71,6 +71,13 @@ Request:
             }
         }
     }
+    
+### Link titles
+
+The [optional `title` attribute][hal spec title] is supported for link relations. For this,
+use the `HalHyperlinkedRelatedField` or `HalHyperlinkedIdentityField` field implementations.
+These support a `title_field` attribute which tells the serializer which model field to 
+use as the link title.
 
 See the [test project][] for a complete Django project with more examples. 
 
@@ -83,3 +90,4 @@ $> make test
 ```
 
 [test project]: tests/
+[hal spec title]: https://tools.ietf.org/html/draft-kelly-json-hal-06#section-5.7
