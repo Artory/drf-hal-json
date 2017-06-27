@@ -16,3 +16,10 @@ class HyperlinkedPropertyField(serializers.Field):
 
     def to_internal_value(self, data):
         raise NotImplementedError()
+
+
+class ContributeTitleField(serializers.SerializerMethodField):
+
+    def __init__(self, **kwargs):
+        self.title_for = kwargs.pop('title_for')
+        super().__init__(**kwargs)

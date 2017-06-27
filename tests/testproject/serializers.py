@@ -1,4 +1,4 @@
-from drf_hal_json.fields import HyperlinkedPropertyField
+from drf_hal_json.fields import HyperlinkedPropertyField, ContributeTitleField
 from drf_hal_json.serializers import HalModelSerializer
 from rest_framework import serializers
 
@@ -65,7 +65,15 @@ class HyperlinkedPropertySerializer(HalModelSerializer):
 
 
 class FileSerializer(HalModelSerializer):
+    self_title = ContributeTitleField(title_for='self')
+    file_title = ContributeTitleField(title_for='file')
 
     class Meta:
         model = FileResource
-        fields = ('self', 'file', 'image')
+        fields = ('self', 'self_title', 'file', 'file_title', 'image')
+
+    def get_self_title(self, obj):
+        return str(obj.pk)
+
+    def get_file_title(self, obj):
+        return obj.file.name

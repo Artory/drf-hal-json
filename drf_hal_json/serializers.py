@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
-from drf_hal_json.fields import HyperlinkedPropertyField
+from drf_hal_json.fields import HyperlinkedPropertyField, ContributeTitleField
 from rest_framework.fields import empty, FileField, ImageField
 from rest_framework.relations import (HyperlinkedIdentityField,
                                       HyperlinkedRelatedField,
@@ -31,6 +31,8 @@ class HalModelSerializer(HyperlinkedModelSerializer):
             val = ret.pop(field_name)
             if val is not None:
                 resp[LINKS_FIELD_NAME][field_name] = {'href': val}
+                if field_name in self.link_title_field_names:
+                    resp[LINKS_FIELD_NAME][field_name]['title'] = ret.pop(self.link_title_field_names[field_name])
 
         for field_name in self.embedded_field_names:
             try:
@@ -53,10 +55,13 @@ class HalModelSerializer(HyperlinkedModelSerializer):
 
         self.embedded_field_names = []
         self.link_field_names = []
+        self.link_title_field_names = {}
 
         for field_name, field in fields.items():
             if self._is_link_field(field):
                 self.link_field_names.append(field_name)
+            if self._is_link_title_field(field):
+                self.link_title_field_names[field.title_for] = field_name
             elif self._is_embedded_field(field):
                 self.embedded_field_names.append(field_name)
         return fields
@@ -69,6 +74,10 @@ class HalModelSerializer(HyperlinkedModelSerializer):
                 isinstance(field, HyperlinkedPropertyField) or
                 isinstance(field, FileField) or
                 isinstance(field, ImageField))
+
+    @staticmethod
+    def _is_link_title_field(field):
+        return isinstance(field, ContributeTitleField)
 
     @staticmethod
     def _is_embedded_field(field):

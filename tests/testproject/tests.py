@@ -148,4 +148,5 @@ class HalTest(TestCase):
         resp = self.client.get("/file-resources/1/")
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
         self.assertIn("file", custom_resource_links)
+        self.assertIn("title", custom_resource_links['file'])
         self.assertIn("image", custom_resource_links)
