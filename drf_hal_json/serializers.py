@@ -1,7 +1,7 @@
 from collections import defaultdict
 
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
-from drf_hal_json.fields import HyperlinkedPropertyField, ContributeTitleField
+from drf_hal_json.fields import HyperlinkedPropertyField, HalContributeTitleField
 from rest_framework.fields import empty, FileField, ImageField
 from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, ManyRelatedField, RelatedField
 from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer
@@ -85,7 +85,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
 
     @staticmethod
     def _is_link_title_field(field):
-        return isinstance(field, ContributeTitleField)
+        return isinstance(field, HalContributeTitleField)
 
     @staticmethod
     def _is_embedded_field(field):

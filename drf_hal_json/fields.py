@@ -18,7 +18,7 @@ class HyperlinkedPropertyField(serializers.Field):
         raise NotImplementedError()
 
 
-class ContributeTitleField(serializers.SerializerMethodField):
+class HalContributeTitleField(serializers.SerializerMethodField):
 
     def __init__(self, **kwargs):
         self.title_for = kwargs.pop('title_for')
