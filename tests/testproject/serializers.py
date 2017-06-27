@@ -16,12 +16,15 @@ class RelatedResource1Serializer(HalModelSerializer):
 
 class RelatedResource2Serializer(HalModelSerializer):
     # related_resources_1 are not embedded, just linked
+    related_resources = serializers.HyperlinkedRelatedField(
+        many=True, read_only=True, view_name='relatedresource1-detail',
+        source='related_resources_1')
     related_resources_1 = HalHyperlinkedRelatedField(
         many=True, read_only=True, view_name='relatedresource1-detail', title_field='name')
 
     class Meta:
         model = RelatedResource2
-        fields = ('self', 'id', 'name', 'active', 'related_resources_1')
+        fields = ('self', 'id', 'name', 'active', 'related_resources', 'related_resources_1')
 
 
 class TestResourceSerializer(HalModelSerializer):
