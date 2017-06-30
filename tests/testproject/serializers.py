@@ -1,4 +1,4 @@
-from drf_hal_json.fields import HyperlinkedPropertyField, HalContributeTitleField
+from drf_hal_json.fields import HyperlinkedPropertyField, HalContributeToLinkField
 from drf_hal_json.serializers import HalModelSerializer
 from drf_hal_json.fields import HalHyperlinkedRelatedField, HalHyperlinkedIdentityField
 from rest_framework import serializers
@@ -70,15 +70,19 @@ class HyperlinkedPropertySerializer(HalModelSerializer):
 
 
 class FileSerializer(HalModelSerializer):
-    self_title = HalContributeTitleField(title_for='self')
-    file_title = HalContributeTitleField(title_for='file')
+    self_title = HalContributeToLinkField(place_on='self')
+    file_title = HalContributeToLinkField(place_on='file')
+    file_type = HalContributeToLinkField(place_on='file', property_name='type')
 
     class Meta:
         model = FileResource
-        fields = ('self', 'self_title', 'file', 'file_title', 'image')
+        fields = ('self', 'self_title', 'file', 'file_title', 'file_type', 'image')
 
     def get_self_title(self, obj):
         return str(obj.pk)
 
     def get_file_title(self, obj):
         return obj.file.name
+
+    def get_file_type(self, obj):
+        return 'application/zip'

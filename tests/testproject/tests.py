@@ -134,4 +134,5 @@ class HalTest(TestCase):
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
         self.assertIn("file", custom_resource_links)
         self.assertIn("title", custom_resource_links['file'])
+        self.assertEqual(custom_resource_links['file']['type'], "application/zip")
         self.assertIn("image", custom_resource_links)

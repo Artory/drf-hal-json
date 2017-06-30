@@ -18,10 +18,12 @@ class HyperlinkedPropertyField(serializers.Field):
         raise NotImplementedError()
 
 
-class HalContributeTitleField(serializers.SerializerMethodField):
+class HalContributeToLinkField(serializers.SerializerMethodField):
+    # https://tools.ietf.org/html/draft-kelly-json-hal-08#section-5
 
     def __init__(self, **kwargs):
-        self.title_for = kwargs.pop('title_for')
+        self.property_name = kwargs.pop('property_name', 'title')
+        self.place_on = kwargs.pop('place_on')
         super().__init__(**kwargs)
 
 
