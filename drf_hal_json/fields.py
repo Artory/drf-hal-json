@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework.relations import Hyperlink
 
 
-class HyperlinkedPropertyField(serializers.Field):
+class HalHyperlinkedPropertyField(serializers.Field):
     process_value = None
 
     def __init__(self, **kwargs):
@@ -31,6 +31,10 @@ class HalHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
 
     def __init__(self, **kwargs):
         self.title_field = kwargs.pop('title_field', None)
+        self.templated_field = kwargs.pop('templated_field', None)
+        self.type_field = kwargs.pop('type_field', None)
+        self.deprecation_field = kwargs.pop('deprecation_field', None)
+        self.name_field = kwargs.pop('name_field', None)
         super().__init__(**kwargs)
 
     def to_representation(self, instance):
@@ -38,6 +42,18 @@ class HalHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
 
         if self.title_field and getattr(instance, self.title_field):
             val['title'] = getattr(instance, self.title_field)
+
+        if self.templated_field and getattr(instance, self.templated_field):
+            val['templated'] = getattr(instance, self.templated_field)
+
+        if self.type_field and getattr(instance, self.type_field):
+            val['type'] = getattr(instance, self.type_field)
+
+        if self.deprecation_field and getattr(instance, self.deprecation_field):
+            val['deprecation'] = getattr(instance, self.deprecation_field)
+
+        if self.name_field and getattr(instance, self.name_field):
+            val['name'] = getattr(instance, self.name_field)
 
         return val
 
@@ -46,6 +62,10 @@ class HalHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
 
     def __init__(self, **kwargs):
         self.title_field = kwargs.pop('title_field', None)
+        self.templated_field = kwargs.pop('templated_field', None)
+        self.type_field = kwargs.pop('type_field', None)
+        self.deprecation_field = kwargs.pop('deprecation_field', None)
+        self.name_field = kwargs.pop('name_field', None)
         super().__init__(**kwargs)
 
     def to_representation(self, instance):
@@ -53,5 +73,17 @@ class HalHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
 
         if self.title_field and getattr(instance, self.title_field):
             val['title'] = getattr(instance, self.title_field)
+
+        if self.templated_field and getattr(instance, self.templated_field):
+            val['templated'] = getattr(instance, self.templated_field)
+
+        if self.type_field and getattr(instance, self.type_field):
+            val['type'] = getattr(instance, self.type_field)
+
+        if self.deprecation_field and getattr(instance, self.deprecation_field):
+            val['deprecation'] = getattr(instance, self.deprecation_field)
+
+        if self.name_field and getattr(instance, self.name_field):
+            val['name'] = getattr(instance, self.name_field)
 
         return val
