@@ -35,22 +35,32 @@ By using the **HalModelSerializer** the content is serialized in the HAL JSON fo
 
 Pagination is supported and will produce `next` and `previous` links.
 
+Model-level relations are both `_linked` and `_embedded` per default. For only
+linking, use `HalHyperlinkedRelatedField` in the serializer.
+
+Django `FileField` and `ImageField` fields are automatically rendered as links.
+
 ## Example ##
 
 Serializer:
 
+```python
     class ResourceSerializer(HalModelSerializer):
         class Meta:
             model = Resource
+```
 
 View:
     
+```python
     class ResourceViewSet(HalCreateModelMixin, ModelViewSet):
         serializer_class = ResourceSerializer
         queryset = Resource.objects.all()
+```
 
 Request:
 
+```
     GET http://localhost/api/resources/1/ HTTP/1.1
     Content-Type  application/hal+json    
 
@@ -71,8 +81,95 @@ Request:
             }
         }
     }
+```
+    
+### Optional link properties
 
-See the [test project][] for a complete Django project with more examples. 
+The HAL spec defines a number of optional link properties, such as [`title`][hal spec title]. 
+These are supported in two different ways.
+
+#### Applying optional properties to links defined as model relations
+
+If the link relationship is based on a model-layer relationship, you can use 
+`HalHyperlinkedRelatedField`, which supports a number of additional keyword 
+parameters, corresponding to the optional link properties in the HAL specification:
+
+```python
+from drf_hal_json.fields import HalHyperlinkedRelatedField
+
+class Resource1Serializer(HalModelSerializer):
+    # when using HalHyperlinkedRelatedField, the related resources
+    # will not be embedded, just linked.
+    related_resources = HalHyperlinkedRelatedField(
+        many=True, read_only=True, view_name='relatedresource-detail',
+        title_field='name')  # .. also type_field, templated_field, etc.  
+
+    class Meta:
+        model = Resource1
+        fields = ('self', 'related_resources')
+```
+
+The above will look up the `name` field of the each related resource and
+use that as the link `title`.
+
+There is also a `HalHyperlinkedIdentityField` which behaves in the same way.
+
+#### Contributing optional properties to links directly
+
+The other way to add custom properties to a link relation is to use
+`HalContributeToLinkField`. This requires a serializer method to be
+added.
+
+```python
+from drf_hal_json.fields import HalContributeToLinkField
+
+class FileSerializer(HalModelSerializer):
+    file_title = HalContributeToLinkField(place_on='file')
+    file_type = HalContributeToLinkField(place_on='file', property_name='type')
+
+    class Meta:
+        model = FileResource
+        fields = ('file', 'file_title', 'file_type')
+
+    def get_file_title(self, obj):
+        return str(obj.pk)
+
+    def get_file_type(self, obj):
+        return 'application/zip'
+```
+
+In the above example, we ride on the fact that Django `FileField`
+and `ImageField` fields are automatically rendered as links.
+
+`HalContributeToLinkField` can be used for any model-level relation
+which are not explicitly linked using `HalHyperlinkedRelatedField`. 
+In this case, `HalContributeToLinkField` can be used to adorn the `self`
+relation of the resource that is linked to with additional properties.
+
+### Other link types
+
+If you need to process a link url, or need to insert an url that is 
+completely separate from whatever model you are serializing, the 
+`HalHyperlinkedPropertyField` can be used.
+
+```python
+from drf_hal_json.fields import HalHyperlinkedPropertyField
+
+class CustomSerializer(HalModelSerializer):
+    url = HalHyperlinkedPropertyField(
+        source='url',
+        process_value=lambda val: val + '?foo=bar')
+
+    class Meta:
+        model = ResourceWithUrl
+        fields = ('self', 'url')
+
+```
+
+### Example project
+
+See the tests for a complete example project that excercises all the features
+of this library.
 
 ## Contributing
 
@@ -83,3 +180,4 @@ $> make test
 ```
 
 [test project]: tests/
+[hal spec title]: https://tools.ietf.org/html/draft-kelly-json-hal-06#section-5.7
