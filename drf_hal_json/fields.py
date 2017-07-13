@@ -17,6 +17,16 @@ class HalHyperlinkedPropertyField(serializers.Field):
     def to_internal_value(self, data):
         raise NotImplementedError()
 
+class HalHyperlinkedSerializerMethodField(serializers.SerializerMethodField):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def to_representation(self, obj):
+        return {'href': super().to_representation(obj)}
+
+    def to_internal_value(self, data):
+        raise NotImplementedError()
+
 
 class HalContributeToLinkField(serializers.SerializerMethodField):
     # https://tools.ietf.org/html/draft-kelly-json-hal-08#section-5

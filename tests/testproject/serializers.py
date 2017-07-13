@@ -1,6 +1,6 @@
 from drf_hal_json.fields import HalHyperlinkedPropertyField, HalContributeToLinkField
 from drf_hal_json.serializers import HalModelSerializer
-from drf_hal_json.fields import HalHyperlinkedRelatedField, HalHyperlinkedIdentityField
+from drf_hal_json.fields import HalHyperlinkedRelatedField, HalHyperlinkedIdentityField, HalHyperlinkedSerializerMethodField
 from rest_framework import serializers
 
 from .models import (AbundantResource, CustomResource, RelatedResource1,
@@ -52,14 +52,18 @@ class CustomResourceSerializer(HalModelSerializer):
     related_resource_2 = RelatedResource2Serializer(read_only=True)
     related_resource_3 = HalHyperlinkedIdentityField(
         read_only=True, view_name='relatedresource3-detail', lookup_field='name')
+    custom_link = HalHyperlinkedSerializerMethodField()
     name = HalContributeToLinkField(place_on='related_resource_3', property_name='title')
 
     class Meta:
         model = CustomResource
-        fields = ('self', 'name', 'related_resource_2', 'related_resource_3')
+        fields = ('self', 'name', 'related_resource_2', 'related_resource_3', 'custom_link')
 
     def get_name(self, obj):
         return obj.name
+
+    def get_custom_link(self, obj):
+        return 'http://www.example.com'
 
 
 class AbundantResourceSerializer(HalModelSerializer):

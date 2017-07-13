@@ -85,7 +85,7 @@ class HalTest(TestCase):
     def test_custom_lookup_field(self):
         resp = self.client.get("/custom-resources/1/")
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
-        self.assertEqual(2, len(custom_resource_links))
+        self.assertEqual(3, len(custom_resource_links))
         self.assertEqual(
             self.TESTSERVER_URL + reverse("customresource-detail", kwargs={"pk": self.custom_resource_1.id}),
             custom_resource_links["self"]["href"])
@@ -136,3 +136,10 @@ class HalTest(TestCase):
         self.assertIn("title", custom_resource_links['file'])
         self.assertEqual(custom_resource_links['file']['type'], "application/zip")
         self.assertIn("image", custom_resource_links)
+
+    def test_serializer_method_link(self):
+        resp = self.client.get("/custom-resources/1/")
+        custom_resource_links = resp.data[LINKS_FIELD_NAME]
+        self.assertIn("custom_link", custom_resource_links)
+        self.assertEqual("http://www.example.com", custom_resource_links["custom_link"]["href"])
+
