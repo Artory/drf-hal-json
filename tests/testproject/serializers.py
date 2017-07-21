@@ -37,7 +37,8 @@ class RelatedResource2Serializer(HalModelSerializer):
 
     class Meta:
         model = RelatedResource2
-        fields = ('self', 'id', 'name', 'active', 'related_resources', 'related_resources_1', 'related_resources_1_noself')
+        fields = ('self', 'id', 'name', 'active', 'related_resources', 'related_resources_1',
+                  'related_resources_1_noself')
 
 
 class TestResourceSerializer(HalModelSerializer):
