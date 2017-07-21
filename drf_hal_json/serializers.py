@@ -50,7 +50,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
             # if a related resource is embedded, it should still
             # get a link in the parent object
             if type(ret[field_name]) == list:
-                embed_self = [self._get_url(x) for x in ret[field_name] if x]
+                embed_self = list(filter(None.__ne__, [self._get_url(x) for x in ret[field_name] if x]))
             else:
                 embed_self = self._get_url(ret[field_name])
             if embed_self:
