@@ -35,7 +35,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
             return None
 
     def to_representation(self, instance):
-        ret = super().to_representation(instance)
+        ret = super(HalModelSerializer, self).to_representation(instance)
         resp = defaultdict(dict)
 
         for field_name in self.link_field_names:
