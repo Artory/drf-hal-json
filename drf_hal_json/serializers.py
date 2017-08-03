@@ -59,7 +59,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
 
     @classmethod
     def many_init(cls, *args, **kwargs):
-        # duplicate ListSerializer.many_init due to Meta dependency (injecting a value was not possible)
+        # duplicate BaseSerializer.many_init due to Meta dependency (injecting a value was not possible)
         allow_empty = kwargs.pop('allow_empty', None)
         child_serializer = cls(*args, **kwargs)
         list_kwargs = {
@@ -73,7 +73,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         })
         meta = getattr(cls, 'Meta', None)
         list_serializer_class = getattr(meta, 'list_serializer_class', HalListSerializer)
-        return list_serializer_class(*args, **kwargs)
+        return list_serializer_class(*args, **list_kwargs)
 
     def build_link_object(self, val):
         if (type([]) == type(val)):
