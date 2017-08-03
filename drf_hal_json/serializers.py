@@ -17,23 +17,17 @@ class HalListSerializer(ListSerializer):
     @property
     def data(self):
         # The parent class returns ReturnList
-        ret = super(ListSerializer, self).data
-        return ReturnDict(ret, serializer=self)
-
-    def to_representation(self, collection):
-        # cribbed from HyperlinkedRelatedField.to_representation
-        assert 'request' in self.context, (
-            "`%s` requires the request in the serializer"
-            " context. Add `context={'request': request}` when instantiating "
-            "the serializer." % self.__class__.__name__
-        )
-        # Wrap the standard ListSerializer in _embedded and populate _links with the URL of the list
-        return {
-            LINKS_FIELD_NAME: {
-                URL_FIELD_NAME: {'href': self.build_view_url()},
+        return ReturnDict(
+            {
+                LINKS_FIELD_NAME: {
+                    URL_FIELD_NAME: {
+                        'href': self.build_view_url()
+                    }
+                },
+                EMBEDDED_FIELD_NAME: super(ListSerializer, self).data
             },
-            EMBEDDED_FIELD_NAME: super(HalListSerializer, self).to_representation(collection)
-        }
+            serializer=self
+        )
 
     def build_view_url(self):
         # Deduce the URL of the view from the Model
@@ -165,7 +159,3 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         field_kwargs = get_nested_relation_kwargs(relation_info)
 
         return field_class, field_kwargs
-
-
-class HalRelatedModelSerializer(HalModelSerializer):
-    default_list_serializer = ListSerializer
