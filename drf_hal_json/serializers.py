@@ -22,6 +22,12 @@ class HalListSerializer(ListSerializer):
         return ReturnDict(ret, serializer=self)
 
     def to_representation(self, collection):
+        # cribbed from HyperlinkedRelatedField.to_representation
+        assert 'request' in self.context, (
+            "`%s` requires the request in the serializer"
+            " context. Add `context={'request': request}` when instantiating "
+            "the serializer." % self.__class__.__name__
+        )
         # Wrap the standard ListSerializer in _embedded and populate _links with the URL of the list
         return {
             LINKS_FIELD_NAME: {
@@ -42,7 +48,7 @@ class HalListSerializer(ListSerializer):
                 'model_name': model._meta.object_name.lower()
             }
         view_name = '{}-list'.format(base_name)
-        return reverse(view_name, request=self._context['request'])
+        return reverse(view_name, request=self.context['request'])
 
 
 class HalModelSerializer(HyperlinkedModelSerializer):
