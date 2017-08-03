@@ -1,12 +1,48 @@
 from collections import defaultdict
 
+import rest_framework
+from rest_framework.reverse import reverse
+from rest_framework.utils.serializer_helpers import ReturnDict
+
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
 from drf_hal_json.fields import HalHyperlinkedPropertyField, HalContributeToLinkField, \
     HalHyperlinkedSerializerMethodField
 from rest_framework.fields import empty, FileField, ImageField
 from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, ManyRelatedField, RelatedField
-from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer
+from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer, ListSerializer
 from rest_framework.utils.field_mapping import get_nested_relation_kwargs
+
+
+class HalListSerializer(ListSerializer):
+
+    @property
+    def data(self):
+        # The parent class returns ReturnList
+        ret = super(ListSerializer, self).data
+        return ReturnDict(ret, serializer=self)
+
+    def to_representation(self, collection):
+        # Wrap the standard ListSerializer in _embedded and populate _links with the URL of the list
+        return {
+            LINKS_FIELD_NAME: {
+                URL_FIELD_NAME: {'href': self.build_view_url()},
+            },
+            EMBEDDED_FIELD_NAME: super(HalListSerializer, self).to_representation(collection)
+        }
+
+    def build_view_url(self):
+        # Deduce the URL of the view from the Model
+        model = getattr(self.child.Meta, 'model')
+        # Support a Meta attribute for adjusting the base_name
+        base_name = getattr(self.child.Meta, 'base_name', None)
+        if base_name is None:
+            # basic approach from rest_framework.utils.field_mapping.get_detail_view_name
+            base_name = '%(model_name)s' % {
+                'app_label': model._meta.app_label,
+                'model_name': model._meta.object_name.lower()
+            }
+        view_name = '{}-list'.format(base_name)
+        return reverse(view_name, request=self._context['request'])
 
 
 class HalModelSerializer(HyperlinkedModelSerializer):
@@ -20,6 +56,12 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         self.nested_serializer_class = self.__class__
         if data != empty and not LINKS_FIELD_NAME in data:
             data[LINKS_FIELD_NAME] = dict()  # put links in data, so that field validation does not fail
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        # implementation recommended by ListSerializer.many_init
+        kwargs['child'] = cls()
+        return HalListSerializer(*args, **kwargs)
 
     def build_link_object(self, val):
         if (type([]) == type(val)):
