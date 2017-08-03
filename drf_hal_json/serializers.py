@@ -8,8 +8,7 @@ from drf_hal_json.fields import HalHyperlinkedPropertyField, HalContributeToLink
     HalHyperlinkedSerializerMethodField
 from rest_framework.fields import empty, FileField, ImageField
 from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, ManyRelatedField, RelatedField
-from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer, ListSerializer, \
-    LIST_SERIALIZER_KWARGS
+from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer, ListSerializer
 from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 
 
@@ -56,6 +55,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
     Serializer for HAL representation of django models
     """
     serializer_related_field = HyperlinkedRelatedField
+    default_list_serializer = HalListSerializer
 
     def __init__(self, instance=None, data=empty, **kwargs):
         super(HalModelSerializer, self).__init__(instance, data, **kwargs)
@@ -65,21 +65,17 @@ class HalModelSerializer(HyperlinkedModelSerializer):
 
     @classmethod
     def many_init(cls, *args, **kwargs):
-        # duplicate BaseSerializer.many_init due to Meta dependency (injecting a value was not possible)
-        allow_empty = kwargs.pop('allow_empty', None)
-        child_serializer = cls(*args, **kwargs)
-        list_kwargs = {
-            'child': child_serializer,
-        }
-        if allow_empty is not None:
-            list_kwargs['allow_empty'] = allow_empty
-        list_kwargs.update({
-            key: value for key, value in kwargs.items()
-            if key in LIST_SERIALIZER_KWARGS
-        })
+        # inject the default into list_serializer_class (if not present)
         meta = getattr(cls, 'Meta', None)
-        list_serializer_class = getattr(meta, 'list_serializer_class', HalListSerializer)
-        return list_serializer_class(*args, **list_kwargs)
+        if meta is None:
+            class Meta:
+                pass
+            meta = Meta
+            setattr(cls, 'Meta', meta)
+        list_serializer_class = getattr(meta, 'list_serializer_class', None)
+        if list_serializer_class is None:
+            setattr(meta, 'list_serializer_class', cls.default_list_serializer)
+        return super(HalModelSerializer, cls).many_init(*args, **kwargs)
 
     def build_link_object(self, val):
         if (type([]) == type(val)):
@@ -169,3 +165,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         field_kwargs = get_nested_relation_kwargs(relation_info)
 
         return field_class, field_kwargs
+
+
+class HalRelatedModelSerializer(HalModelSerializer):
+    default_list_serializer = ListSerializer

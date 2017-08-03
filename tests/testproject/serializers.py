@@ -1,13 +1,13 @@
 from drf_hal_json.fields import (HalContributeToLinkField, HalHyperlinkedIdentityField, HalHyperlinkedPropertyField,
                                  HalHyperlinkedRelatedField, HalHyperlinkedSerializerMethodField)
-from drf_hal_json.serializers import HalModelSerializer
+from drf_hal_json.serializers import HalModelSerializer, HalRelatedModelSerializer
 from rest_framework import serializers
 
 from .models import (AbundantResource, CustomResource, FileResource, RelatedResource1, RelatedResource2,
                      RelatedResource3, TestResource, URLResource)
 
 
-class RelatedResource1Serializer(HalModelSerializer):
+class RelatedResource1Serializer(HalRelatedModelSerializer):
     name = HalContributeToLinkField(place_on='self', property_name='title')
 
     class Meta:
