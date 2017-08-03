@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-import rest_framework
 from rest_framework.reverse import reverse
 from rest_framework.utils.serializer_helpers import ReturnDict
 
