@@ -17,7 +17,10 @@ Until then this should not be considered stable.
     REST_FRAMEWORK = {
         'DEFAULT_PAGINATION_CLASS': 'drf_hal_json.pagination.HalPageNumberPagination',
         'DEFAULT_PARSER_CLASSES': ('drf_hal_json.parsers.JsonHalParser',),
-        'DEFAULT_RENDERER_CLASSES': ('drf_hal_json.renderers.JsonHalRenderer',),
+        'DEFAULT_RENDERER_CLASSES': (
+            'drf_hal_json.renderers.JsonHalRenderer',
+            'rest_framework.renderers.BrowsableAPIRenderer',
+        ),
 
         # To make self links render as 'self' and not 'url', as per the HAL spec
         'URL_FIELD_NAME': 'self',
