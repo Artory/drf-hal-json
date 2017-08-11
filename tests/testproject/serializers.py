@@ -1,11 +1,10 @@
-from drf_hal_json.fields import HalHyperlinkedPropertyField, HalContributeToLinkField
+from drf_hal_json.fields import (HalContributeToLinkField, HalHyperlinkedIdentityField, HalHyperlinkedPropertyField,
+                                 HalHyperlinkedRelatedField, HalHyperlinkedSerializerMethodField)
 from drf_hal_json.serializers import HalModelSerializer
-from drf_hal_json.fields import HalHyperlinkedRelatedField, HalHyperlinkedIdentityField, HalHyperlinkedSerializerMethodField
 from rest_framework import serializers
 
-from .models import (AbundantResource, CustomResource, RelatedResource1,
-                     RelatedResource2, RelatedResource3, TestResource,
-                     URLResource, FileResource)
+from .models import (AbundantResource, CustomResource, FileResource, RelatedResource1, RelatedResource2,
+                     RelatedResource3, TestResource, URLResource)
 
 
 class RelatedResource1Serializer(HalModelSerializer):
@@ -81,14 +80,24 @@ class AbundantResourceSerializer(HalModelSerializer):
 
 
 class HyperlinkedPropertySerializer(HalModelSerializer):
-    url = HalHyperlinkedPropertyField()
-    url_processed = HalHyperlinkedPropertyField(
-        source='url',
+    url_abs = HalHyperlinkedPropertyField()
+    url_rel = HalHyperlinkedPropertyField()
+    url_abs_processed = HalHyperlinkedPropertyField(
+        source='url_abs',
+        process_value=lambda val: val + '?foo=bar')
+    url_rel_processed = HalHyperlinkedPropertyField(
+        source='url_rel',
         process_value=lambda val: val + '?foo=bar')
 
     class Meta:
         model = URLResource
-        fields = ('self', 'url', 'url_processed')
+        fields = (
+            'self',
+            'url_abs',
+            'url_rel',
+            'url_abs_processed',
+            'url_rel_processed',
+        )
 
 
 class FileSerializer(HalModelSerializer):

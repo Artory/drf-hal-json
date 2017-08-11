@@ -12,6 +12,8 @@ class HalHyperlinkedPropertyField(serializers.Field):
 
     def to_representation(self, obj):
         val = self.process_value(obj) if self.process_value else obj
+        if 'request' in self.context:
+            val = self.context['request'].build_absolute_uri(val)
         return Hyperlink(val, val)
 
     def to_internal_value(self, data):

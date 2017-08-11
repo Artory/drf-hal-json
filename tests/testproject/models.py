@@ -44,7 +44,8 @@ class AbundantResource(models.Model):
 
 
 class URLResource(models.Model):
-    url = models.CharField(max_length=255)
+    url_abs = models.CharField(max_length=255)
+    url_rel = models.CharField(max_length=255)
 
 
 class FileResource(models.Model):

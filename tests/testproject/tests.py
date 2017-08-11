@@ -3,8 +3,8 @@ from django.test import TestCase
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME
 from rest_framework.reverse import reverse
 
-from .models import (AbundantResource, CustomResource, RelatedResource1, RelatedResource2, RelatedResource3,
-                     TestResource, URLResource, FileResource)
+from .models import (AbundantResource, CustomResource, FileResource, RelatedResource1, RelatedResource2,
+                     RelatedResource3, TestResource, URLResource)
 
 
 class HalTest(TestCase):
@@ -28,7 +28,9 @@ class HalTest(TestCase):
             name="Custom-Resource-2",
             related_resource_3=self.related_resource_3,
             related_resource_2=self.related_resource_2)
-        self.url_resource = URLResource.objects.create(url="https://www.example.com/")
+        self.url_resource = URLResource.objects.create(
+            url_abs="https://www.example.com/",
+            url_rel="/example/")
         self.file_resource = FileResource()
         self.file_resource.file.save('foo', ContentFile(b'bar'))
         self.file_resource.image.save('image', ContentFile(b'JPEG'))
@@ -99,9 +101,13 @@ class HalTest(TestCase):
         resp = self.client.get("/url-resources/1/")
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
         self.assertEqual('https://www.example.com/',
-                         custom_resource_links["url"]["href"])
+                         custom_resource_links["url_abs"]["href"])
+        self.assertEqual(self.TESTSERVER_URL + '/example/',
+                         custom_resource_links["url_rel"]["href"])
         self.assertEqual('https://www.example.com/?foo=bar',
-                         custom_resource_links["url_processed"]["href"])
+                         custom_resource_links["url_abs_processed"]["href"])
+        self.assertEqual(self.TESTSERVER_URL + '/example/?foo=bar',
+                         custom_resource_links["url_rel_processed"]["href"])
 
     def test_pagination(self):
         no_pages = self.client.get("/test-resources/").data
@@ -142,4 +148,3 @@ class HalTest(TestCase):
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
         self.assertIn("custom_link", custom_resource_links)
         self.assertEqual("http://www.example.com", custom_resource_links["custom_link"]["href"])
-
