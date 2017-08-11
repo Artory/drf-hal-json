@@ -2,18 +2,18 @@
 
 drf-hal-json
 =================
-Extension for Django REST Framework 3 which allows for using content-type application/hal-json. 
+Extension for Django REST Framework 3 which allows for using content-type application/hal-json.
 
 ## Status ##
 
-This fork of https://github.com/seebass/drf-hal-json is under active development. 
+This fork of https://github.com/seebass/drf-hal-json is under active development.
 As soon as there is a stable version ready, we'll do a merge and push a PyPI package.
 Until then this should not be considered stable.
 
 ## Setup ##
 
     pip install drf-hal-json
-    
+
     REST_FRAMEWORK = {
         'DEFAULT_PAGINATION_CLASS': 'drf_hal_json.pagination.HalPageNumberPagination',
         'DEFAULT_PARSER_CLASSES': ('drf_hal_json.parsers.JsonHalParser',),
@@ -54,7 +54,7 @@ Serializer:
 ```
 
 View:
-    
+
 ```python
     class ResourceViewSet(HalCreateModelMixin, ModelViewSet):
         serializer_class = ResourceSerializer
@@ -65,7 +65,7 @@ Request:
 
 ```
     GET http://localhost/api/resources/1/ HTTP/1.1
-    Content-Type  application/hal+json    
+    Content-Type  application/hal+json
 
     {
         "_links": {
@@ -85,16 +85,16 @@ Request:
         }
     }
 ```
-    
+
 ### Optional link properties
 
-The HAL spec defines a number of optional link properties, such as [`title`][hal spec title]. 
+The HAL spec defines a number of optional link properties, such as [`title`][hal spec title].
 These are supported in two different ways.
 
 #### Applying optional properties to links defined as model relations
 
-If the link relationship is based on a model-layer relationship, you can use 
-`HalHyperlinkedRelatedField`, which supports a number of additional keyword 
+If the link relationship is based on a model-layer relationship, you can use
+`HalHyperlinkedRelatedField`, which supports a number of additional keyword
 parameters, corresponding to the optional link properties in the HAL specification:
 
 ```python
@@ -105,7 +105,7 @@ class Resource1Serializer(HalModelSerializer):
     # will not be embedded, just linked.
     related_resources = HalHyperlinkedRelatedField(
         many=True, read_only=True, view_name='relatedresource-detail',
-        title_field='name')  # .. also type_field, templated_field, etc.  
+        title_field='name')  # .. also type_field, templated_field, etc.
 
     class Meta:
         model = Resource1
@@ -145,28 +145,52 @@ In the above example, we ride on the fact that Django `FileField`
 and `ImageField` fields are automatically rendered as links.
 
 `HalContributeToLinkField` can be used for any model-level relation
-which are not explicitly linked using `HalHyperlinkedRelatedField`. 
+which are not explicitly linked using `HalHyperlinkedRelatedField`.
 In this case, `HalContributeToLinkField` can be used to adorn the `self`
 relation of the resource that is linked to with additional properties.
 
 ### Other link types
 
-If you need to process a link url, or need to insert an url that is 
-completely separate from whatever model you are serializing, the 
+If you need to process a link URL, or need to insert a URL that is
+completely separate from whatever model you are serializing, the
 `HalHyperlinkedPropertyField` can be used.
 
-```python
+``` python
 from drf_hal_json.fields import HalHyperlinkedPropertyField
 
+class ResourceWithUrl(Model):
+    @property
+    def get_docs_url(self):
+        return '/docs/foo'
+
+    @property
+    def external_url(self):
+        return 'http://example.com/'
+
 class CustomSerializer(HalModelSerializer):
-    url = HalHyperlinkedPropertyField(
-        source='url',
-        process_value=lambda val: val + '?foo=bar')
+    docs_url = HalHyperlinkedPropertyField(
+        source='get_docs_url',
+        process_value=lambda val: val + '?bar')
+    external_url = HalHyperlinkedPropertyField()
 
     class Meta:
         model = ResourceWithUrl
-        fields = ('self', 'url')
+        fields = ('self', 'docs_url', 'external_url')
+```
 
+This will serialize into:
+
+``` json
+{
+    "_links": {
+        "docs_url": {
+            "href": "http://localhost/docs/foo?bar"
+        },
+        "external_url": {
+            "href": "http://example.com/"
+        }
+    }
+}
 ```
 
 ### Example project
