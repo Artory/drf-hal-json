@@ -3,13 +3,13 @@ from rest_framework.viewsets import ModelViewSet
 
 from .models import (AbundantResource, CustomResource, RelatedResource1,
                      RelatedResource2, RelatedResource3, TestResource,
-                     URLResource, FileResource)
+                     URLResource, FileResource, SlugRelatedResource)
 from .serializers import (AbundantResourceSerializer, CustomResourceSerializer,
                           HyperlinkedPropertySerializer,
                           RelatedResource1Serializer,
                           RelatedResource2Serializer,
                           RelatedResource3Serializer, TestResourceSerializer,
-                          FileSerializer)
+                          FileSerializer, SlugRelatedResourceSerializer)
 
 
 class CustomResourceViewSet(HalCreateModelMixin, ModelViewSet):
@@ -36,6 +36,11 @@ class RelatedResource3ViewSet(HalCreateModelMixin, ModelViewSet):
     serializer_class = RelatedResource3Serializer
     queryset = RelatedResource3.objects.all()
     lookup_field = 'name'
+
+
+class SlugRelatedResourceViewSet(HalCreateModelMixin, ModelViewSet):
+    serializer_class = SlugRelatedResourceSerializer
+    queryset = SlugRelatedResource.objects.all()
 
 
 class AbundantResourceViewSet(HalCreateModelMixin, ModelViewSet):

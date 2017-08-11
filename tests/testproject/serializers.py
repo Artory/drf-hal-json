@@ -1,10 +1,11 @@
+from rest_framework.relations import SlugRelatedField
+
 from drf_hal_json.fields import (HalContributeToLinkField, HalHyperlinkedIdentityField, HalHyperlinkedPropertyField,
                                  HalHyperlinkedRelatedField, HalHyperlinkedSerializerMethodField)
 from drf_hal_json.serializers import HalModelSerializer
-from rest_framework import serializers
 
 from .models import (AbundantResource, CustomResource, FileResource, RelatedResource1, RelatedResource2,
-                     RelatedResource3, TestResource, URLResource)
+                     RelatedResource3, TestResource, URLResource, SlugRelatedResource)
 
 
 class RelatedResource1Serializer(HalModelSerializer):
@@ -26,7 +27,7 @@ class RelatedResource1NoSelfSerializer(RelatedResource1Serializer):
 
 class RelatedResource2Serializer(HalModelSerializer):
     # These related resources are not embedded, just linked
-    related_resources = serializers.HyperlinkedRelatedField(
+    related_resources = HalHyperlinkedRelatedField(
         many=True, read_only=True, view_name='relatedresource1-detail',
         source='related_resources_1')
     related_resources_1 = HalHyperlinkedRelatedField(
@@ -71,6 +72,14 @@ class CustomResourceSerializer(HalModelSerializer):
 
     def get_custom_link(self, obj):
         return 'http://www.example.com'
+
+
+class SlugRelatedResourceSerializer(HalModelSerializer):
+    class Meta:
+        model = SlugRelatedResource
+        fields = ('self', 'slug_related')
+
+    slug_related = SlugRelatedField(slug_field='name', read_only=True)
 
 
 class AbundantResourceSerializer(HalModelSerializer):
