@@ -24,7 +24,10 @@ class HalListSerializer(ListSerializer):
                         'href': self.build_view_url()
                     }
                 },
-                EMBEDDED_FIELD_NAME: super(ListSerializer, self).data
+                EMBEDDED_FIELD_NAME: {
+                    # `items` mirrors hardcoded value in pagination classes
+                    'items': super(ListSerializer, self).data
+                }
             },
             serializer=self
         )
