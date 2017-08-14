@@ -35,7 +35,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
             return None
 
     def to_representation(self, instance):
-        ret = super().to_representation(instance)
+        ret = super(HalModelSerializer, self).to_representation(instance)
         resp = defaultdict(dict)
 
         for field_name in self.link_field_names:
@@ -50,7 +50,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
             # if a related resource is embedded, it should still
             # get a link in the parent object
             if type(ret[field_name]) == list:
-                embed_self = list(filter(None.__ne__, [self._get_url(x) for x in ret[field_name] if x]))
+                embed_self = list(filter(lambda x: x is not None, [self._get_url(x) for x in ret[field_name] if x]))
             else:
                 embed_self = self._get_url(ret[field_name])
             if embed_self:
