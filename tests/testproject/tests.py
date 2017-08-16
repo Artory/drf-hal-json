@@ -142,6 +142,9 @@ class HalTest(TestCase):
         self.assertIn("title", custom_resource_links['file'])
         self.assertEqual(custom_resource_links['file']['type'], "application/zip")
         self.assertIn("image", custom_resource_links)
+        self.assertIn("self", custom_resource_links)
+        # HalContributeToLinkField returning None should be suppressed
+        self.assertNotIn("none", custom_resource_links['self'])
 
     def test_serializer_method_link(self):
         resp = self.client.get("/custom-resources/1/")

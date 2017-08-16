@@ -44,7 +44,8 @@ class HalModelSerializer(HyperlinkedModelSerializer):
                 resp[LINKS_FIELD_NAME][field_name] = self.build_link_object(val)
                 for property_name in self.link_property_fields.get(field_name, []):
                     prop = ret.pop(self.link_property_fields[field_name][property_name])
-                    resp[LINKS_FIELD_NAME][field_name][property_name] = prop
+                    if prop is not None:
+                        resp[LINKS_FIELD_NAME][field_name][property_name] = prop
 
         for field_name in self.embedded_field_names:
             # if a related resource is embedded, it should still

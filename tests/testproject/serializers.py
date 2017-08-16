@@ -104,10 +104,11 @@ class FileSerializer(HalModelSerializer):
     self_title = HalContributeToLinkField(place_on='self')
     file_title = HalContributeToLinkField(place_on='file')
     file_type = HalContributeToLinkField(place_on='file', property_name='type')
+    self_none = HalContributeToLinkField(place_on='self', property_name='none')
 
     class Meta:
         model = FileResource
-        fields = ('self', 'self_title', 'file', 'file_title', 'file_type', 'image')
+        fields = ('self', 'self_title', 'file', 'file_title', 'file_type', 'image', 'self_none')
 
     def get_self_title(self, obj):
         return str(obj.pk)
@@ -117,3 +118,6 @@ class FileSerializer(HalModelSerializer):
 
     def get_file_type(self, obj):
         return 'application/zip'
+
+    def get_self_none(self, obj):
+        return None
