@@ -167,13 +167,10 @@ class HalTest(TestCase):
     def test_filefield_serialization(self):
         resp = self.client.get("/file-resources/1/")
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
-        self.assertIn("file", custom_resource_links)
-        self.assertIn("title", custom_resource_links['file'])
-        self.assertEqual(custom_resource_links['file']['type'], "application/zip")
-        self.assertIn("image", custom_resource_links)
-        self.assertIn("self", custom_resource_links)
-        # HalContributeToLinkField returning None should be suppressed
-        self.assertNotIn("none", custom_resource_links['self'])
+        self.assertNotIn("file", custom_resource_links,
+                         msg="basic FileFields should not be included in links")
+        self.assertNotIn("none", custom_resource_links['self'],
+                         msg="HalContributeToLinkField returning None should be suppressed")
 
     def test_serializer_method_link(self):
         resp = self.client.get("/custom-resources/1/")
