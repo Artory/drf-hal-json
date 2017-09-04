@@ -140,6 +140,10 @@ class FileSerializer(HalModelSerializer):
         return 'application/zip'
 ```
 
+See the implementation of `HalFileField` to see how a URL-producing
+serializer (by default `FileField` serializes to a URL) can be included
+in `_links`.
+
 `HalContributeToLinkField` can be used for any model-level relation
 which are not explicitly linked using `HalHyperlinkedRelatedField`.
 In this case, `HalContributeToLinkField` can be used to adorn the `self`
