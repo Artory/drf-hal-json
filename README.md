@@ -125,7 +125,7 @@ added.
 from drf_hal_json.fields import HalContributeToLinkField
 
 class FileSerializer(HalModelSerializer):
-    file = HalHyperlinkedRelatedField()
+    file = HalFileField()
     file_title = HalContributeToLinkField(place_on='file')
     file_type = HalContributeToLinkField(place_on='file', property_name='type')
 

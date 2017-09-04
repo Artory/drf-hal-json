@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
 from drf_hal_json.fields import HalContributeToLinkField, HalHyperlinkedRelatedField, HalHyperlinkedIdentityField, \
-    HalIncludeInLinksMixin, HalHyperlinkedPropertyField, HalHyperlinkedSerializerMethodField
+    HalIncludeInLinksMixin
 from rest_framework.fields import empty
 from rest_framework.relations import ManyRelatedField
 from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer
