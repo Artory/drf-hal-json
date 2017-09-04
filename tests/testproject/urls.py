@@ -4,7 +4,8 @@ from rest_framework.routers import DefaultRouter
 from .views import (AbundantResourceViewSet, CustomResourceViewSet,
                     RelatedResource1ViewSet, RelatedResource2ViewSet,
                     RelatedResource3ViewSet, TestResourceViewSet,
-                    URLResourceViewSet, FileResourceViewSet, SlugRelatedResourceViewSet)
+                    URLResourceViewSet, FileResourceViewSet,
+                    SlugRelatedResourceViewSet, HalFileResourceViewSet)
 
 router = DefaultRouter()
 router.register(r'test-resources', TestResourceViewSet)
@@ -16,4 +17,5 @@ router.register(r'slug-resources', SlugRelatedResourceViewSet)
 router.register(r'abundant-resources', AbundantResourceViewSet)
 router.register(r'url-resources', URLResourceViewSet)
 router.register(r'file-resources', FileResourceViewSet)
+router.register(r'hal-file-resources', HalFileResourceViewSet)
 urlpatterns = router.urls

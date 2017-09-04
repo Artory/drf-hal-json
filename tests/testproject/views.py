@@ -9,7 +9,7 @@ from .serializers import (AbundantResourceSerializer, CustomResourceSerializer,
                           RelatedResource1Serializer,
                           RelatedResource2Serializer,
                           RelatedResource3Serializer, TestResourceSerializer,
-                          FileSerializer, SlugRelatedResourceSerializer)
+                          FileSerializer, SlugRelatedResourceSerializer, HalFileSerializer)
 
 
 class CustomResourceViewSet(HalCreateModelMixin, ModelViewSet):
@@ -55,4 +55,9 @@ class URLResourceViewSet(HalCreateModelMixin, ModelViewSet):
 
 class FileResourceViewSet(HalCreateModelMixin, ModelViewSet):
     serializer_class = FileSerializer
+    queryset = FileResource.objects.all()
+
+
+class HalFileResourceViewSet(HalCreateModelMixin, ModelViewSet):
+    serializer_class = HalFileSerializer
     queryset = FileResource.objects.all()

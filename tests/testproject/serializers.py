@@ -1,7 +1,7 @@
 from rest_framework.relations import SlugRelatedField
 
 from drf_hal_json.fields import (HalContributeToLinkField, HalHyperlinkedIdentityField, HalHyperlinkedPropertyField,
-                                 HalHyperlinkedRelatedField, HalHyperlinkedSerializerMethodField)
+                                 HalHyperlinkedRelatedField, HalHyperlinkedSerializerMethodField, HalFileField)
 from drf_hal_json.serializers import HalModelSerializer
 
 from .models import (AbundantResource, CustomResource, FileResource, RelatedResource1, RelatedResource2,
@@ -130,3 +130,19 @@ class FileSerializer(HalModelSerializer):
 
     def get_self_none(self, obj):
         return None
+
+
+class HalFileSerializer(HalModelSerializer):
+    file = HalFileField()
+    file_title = HalContributeToLinkField(place_on='file')
+    file_type = HalContributeToLinkField(place_on='file', property_name='type')
+
+    class Meta:
+        model = FileResource
+        fields = ('file', 'file_title', 'file_type')
+
+    def get_file_title(self, obj):
+        return str(obj.pk)
+
+    def get_file_type(self, obj):
+        return 'application/zip'

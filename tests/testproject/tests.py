@@ -172,6 +172,18 @@ class HalTest(TestCase):
         self.assertNotIn("none", custom_resource_links['self'],
                          msg="HalContributeToLinkField returning None should be suppressed")
 
+    def test_readme_contribute_example(self):
+        resp = self.client.get("/hal-file-resources/1/")
+        custom_resource_links = resp.data[LINKS_FIELD_NAME]
+        self.assertIn("file", custom_resource_links,
+                      msg='HalFileField should be included in _links')
+        self.assertIn("title", custom_resource_links['file'],
+                      msg='HalContributeToLinkField should have been included in _links.file')
+        self.assertIn("type", custom_resource_links['file'],
+                      msg='HalContributeToLinkField should have been included in _links.file')
+        self.assertEqual(custom_resource_links['file']['type'], "application/zip",
+                         msg='_links.file.type should equal static return of get_file_type (i.e. "application/zip")')
+
     def test_serializer_method_link(self):
         resp = self.client.get("/custom-resources/1/")
         custom_resource_links = resp.data[LINKS_FIELD_NAME]

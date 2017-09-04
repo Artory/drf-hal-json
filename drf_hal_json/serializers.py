@@ -1,8 +1,8 @@
 from collections import defaultdict
 
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
-from drf_hal_json.fields import HalHyperlinkedPropertyField, HalContributeToLinkField, \
-    HalHyperlinkedSerializerMethodField, HalHyperlinkedRelatedField, HalHyperlinkedIdentityField
+from drf_hal_json.fields import HalContributeToLinkField, HalHyperlinkedRelatedField, HalHyperlinkedIdentityField, \
+    HalIncludeInLinksMixin, HalHyperlinkedPropertyField, HalHyperlinkedSerializerMethodField
 from rest_framework.fields import empty
 from rest_framework.relations import ManyRelatedField
 from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer
@@ -83,12 +83,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         # ManyRelatedField could wrap any type so we need to analyze the underlying type
         if isinstance(field, ManyRelatedField):
             field = field.child_relation
-        return (
-            isinstance(field, HalHyperlinkedRelatedField) or
-            isinstance(field, HalHyperlinkedIdentityField) or
-            isinstance(field, HalHyperlinkedPropertyField) or
-            isinstance(field, HalHyperlinkedSerializerMethodField)
-        )
+        return isinstance(field, HalIncludeInLinksMixin)
 
     @staticmethod
     def _is_link_contribution_field(field):

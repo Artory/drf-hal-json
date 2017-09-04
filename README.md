@@ -41,8 +41,6 @@ Pagination is supported and will produce `next` and `previous` links.
 Model-level relations are both `_linked` and `_embedded` per default. For only
 linking, use `HalHyperlinkedRelatedField` in the serializer.
 
-Django `FileField` and `ImageField` fields are automatically rendered as links.
-
 ## Example ##
 
 Serializer:
@@ -127,6 +125,7 @@ added.
 from drf_hal_json.fields import HalContributeToLinkField
 
 class FileSerializer(HalModelSerializer):
+    file = HalHyperlinkedRelatedField()
     file_title = HalContributeToLinkField(place_on='file')
     file_type = HalContributeToLinkField(place_on='file', property_name='type')
 
@@ -140,9 +139,6 @@ class FileSerializer(HalModelSerializer):
     def get_file_type(self, obj):
         return 'application/zip'
 ```
-
-In the above example, we ride on the fact that Django `FileField`
-and `ImageField` fields are automatically rendered as links.
 
 `HalContributeToLinkField` can be used for any model-level relation
 which are not explicitly linked using `HalHyperlinkedRelatedField`.
