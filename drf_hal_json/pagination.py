@@ -18,7 +18,7 @@ class HalPageNumberPagination(PageNumberPagination):
         if self.get_previous_link():
             links['previous'] = {'href': self.get_previous_link()}
         template_url = replace_query_param(self.request.build_absolute_uri(), self.page_query_param, '_PAGE_')
-        links['pages'] = {
+        links['page'] = {
             'href': template_url.replace('_PAGE_', '{?page}'),  # need this trick because of URL encoding
             'templated': True}
         result[LINKS_FIELD_NAME] = links
