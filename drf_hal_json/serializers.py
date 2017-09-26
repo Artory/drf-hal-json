@@ -1,6 +1,5 @@
 from collections import defaultdict
 
-from rest_framework.reverse import reverse
 from rest_framework.utils.serializer_helpers import ReturnDict
 
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
@@ -21,7 +20,7 @@ class HalListSerializer(ListSerializer):
             {
                 LINKS_FIELD_NAME: {
                     URL_FIELD_NAME: {
-                        'href': self.build_view_url()
+                        'href': self.context['request'].build_absolute_uri()
                     }
                 },
                 EMBEDDED_FIELD_NAME: {
@@ -31,20 +30,6 @@ class HalListSerializer(ListSerializer):
             },
             serializer=self
         )
-
-    def build_view_url(self):
-        # Deduce the URL of the view from the Model
-        model = getattr(self.child.Meta, 'model')
-        # Support a Meta attribute for adjusting the base_name
-        base_name = getattr(self.child.Meta, 'base_name', None)
-        if base_name is None:
-            # basic approach from rest_framework.utils.field_mapping.get_detail_view_name
-            base_name = '%(model_name)s' % {
-                'app_label': model._meta.app_label,
-                'model_name': model._meta.object_name.lower()
-            }
-        view_name = '{}-list'.format(base_name)
-        return reverse(view_name, request=self.context['request'])
 
 
 class HalModelSerializer(HyperlinkedModelSerializer):
