@@ -5,7 +5,9 @@ from .views import (AbundantResourceViewSet, CustomResourceViewSet,
                     RelatedResource1ViewSet, RelatedResource2ViewSet,
                     RelatedResource3ViewSet, TestResourceViewSet,
                     URLResourceViewSet, FileResourceViewSet,
-                    SlugRelatedResourceViewSet, HalFileResourceViewSet)
+                    SlugRelatedResourceViewSet, HalFileResourceViewSet,
+                    AbundantUnpagedViewSet
+                    )
 
 router = DefaultRouter()
 router.register(r'test-resources', TestResourceViewSet)
@@ -15,6 +17,7 @@ router.register(r'related-resources-3', RelatedResource3ViewSet)
 router.register(r'custom-resources', CustomResourceViewSet)
 router.register(r'slug-resources', SlugRelatedResourceViewSet)
 router.register(r'abundant-resources', AbundantResourceViewSet)
+router.register(r'abundant-unpaged', AbundantUnpagedViewSet)
 router.register(r'url-resources', URLResourceViewSet)
 router.register(r'file-resources', FileResourceViewSet)
 router.register(r'hal-file-resources', HalFileResourceViewSet)

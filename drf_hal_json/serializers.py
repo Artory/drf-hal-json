@@ -1,26 +1,63 @@
 from collections import defaultdict
 
+from rest_framework.utils.serializer_helpers import ReturnDict
+
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
-from drf_hal_json.fields import HalContributeToLinkField, HalHyperlinkedRelatedField, HalHyperlinkedIdentityField, \
-    HalIncludeInLinksMixin
+from drf_hal_json.fields import HalContributeToLinkField, HalHyperlinkedIdentityField, HalIncludeInLinksMixin
 from rest_framework.fields import empty
-from rest_framework.relations import ManyRelatedField
-from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer
+from rest_framework.relations import ManyRelatedField, HyperlinkedRelatedField
+from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer, ListSerializer
 from rest_framework.utils.field_mapping import get_nested_relation_kwargs
+
+
+class HalListSerializer(ListSerializer):
+
+    @property
+    def data(self):
+        # The parent class returns ReturnList
+        return ReturnDict(
+            {
+                LINKS_FIELD_NAME: {
+                    URL_FIELD_NAME: {
+                        'href': self.context['request'].build_absolute_uri()
+                    }
+                },
+                EMBEDDED_FIELD_NAME: {
+                    # `items` mirrors hardcoded value in pagination classes
+                    'items': super(ListSerializer, self).data
+                }
+            },
+            serializer=self
+        )
 
 
 class HalModelSerializer(HyperlinkedModelSerializer):
     """
     Serializer for HAL representation of django models
     """
-    serializer_related_field = HalHyperlinkedRelatedField
+    serializer_related_field = HyperlinkedRelatedField
     serializer_url_field = HalHyperlinkedIdentityField
+    default_list_serializer = HalListSerializer
 
     def __init__(self, instance=None, data=empty, **kwargs):
         super(HalModelSerializer, self).__init__(instance, data, **kwargs)
         self.nested_serializer_class = self.__class__
         if data != empty and not LINKS_FIELD_NAME in data:
             data[LINKS_FIELD_NAME] = dict()  # put links in data, so that field validation does not fail
+
+    @classmethod
+    def many_init(cls, *args, **kwargs):
+        # inject the default into list_serializer_class (if not present)
+        meta = getattr(cls, 'Meta', None)
+        if meta is None:
+            class Meta:
+                pass
+            meta = Meta
+            setattr(cls, 'Meta', meta)
+        list_serializer_class = getattr(meta, 'list_serializer_class', None)
+        if list_serializer_class is None:
+            setattr(meta, 'list_serializer_class', cls.default_list_serializer)
+        return super(HalModelSerializer, cls).many_init(*args, **kwargs)
 
     def build_link_object(self, val):
         if (type([]) == type(val)):

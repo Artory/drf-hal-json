@@ -48,6 +48,10 @@ class AbundantResourceViewSet(HalCreateModelMixin, ModelViewSet):
     queryset = AbundantResource.objects.all()
 
 
+class AbundantUnpagedViewSet(AbundantResourceViewSet):
+    pagination_class = None
+
+
 class URLResourceViewSet(HalCreateModelMixin, ModelViewSet):
     serializer_class = HyperlinkedPropertySerializer
     queryset = URLResource.objects.all()
