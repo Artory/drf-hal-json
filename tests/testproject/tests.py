@@ -121,6 +121,15 @@ class HalTest(TestCase):
         self.assertIn("next", pages["_links"])
         next_link = pages["_links"]["next"]["href"]
 
+        unpaged = self.client.get("/abundant-unpaged/").data
+        # Renders with _links and _embedded
+        self.assertIn("_links", unpaged)
+        self.assertIn("_embedded", unpaged)
+        self.assertIn("self", unpaged["_links"])
+        # Includes no pages
+        self.assertNotIn("previous", unpaged["_links"])
+        self.assertNotIn("next", unpaged["_links"])
+
         pages = self.client.get(next_link).data
         self.assertIn("self", pages["_links"])
         self.assertIn("previous", pages["_links"])
