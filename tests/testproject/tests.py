@@ -4,7 +4,7 @@ from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME
 from rest_framework.reverse import reverse
 
 from .models import (AbundantResource, CustomResource, FileResource, RelatedResource1, RelatedResource2,
-                     RelatedResource3, TestResource, URLResource)
+                     RelatedResource3, TestResource, URLResource, SlugRelatedResource)
 
 
 class HalTest(TestCase):
@@ -34,6 +34,10 @@ class HalTest(TestCase):
         self.file_resource = FileResource()
         self.file_resource.file.save('foo', ContentFile(b'bar'))
         self.file_resource.image.save('image', ContentFile(b'JPEG'))
+        self.slug_resource = SlugRelatedResource()
+        self.slug_resource.save()
+        self.slug_resource.slug_related.add(self.test_resource_1)
+        self.slug_resource.save()
 
         for i in range(0, 50):
             AbundantResource.objects.create(name="Abundant Resource {}".format(i))
@@ -42,7 +46,10 @@ class HalTest(TestCase):
         resp = self.client.get("/test-resources/1/")
         self.assertEqual(200, resp.status_code, resp.content)
         test_resource_data = resp.data
-        self.assertEqual(4, len(test_resource_data))
+        self.assertEqual(
+            {'_embedded', '_links', 'id', 'name'},
+            set(test_resource_data.keys())
+        )
         self.assertEqual(self.test_resource_1.id, test_resource_data['id'])
         self.assertEqual(self.test_resource_1.name, test_resource_data['name'])
 
@@ -50,7 +57,10 @@ class HalTest(TestCase):
         resp = self.client.get("/test-resources/1/")
 
         test_resource_links = resp.data[LINKS_FIELD_NAME]
-        self.assertEqual(3, len(test_resource_links))
+        self.assertEqual(
+            {'self', 'related_resource_2', 'related_resource_1'},
+            set(test_resource_links.keys())
+        )
         self.assertEqual(self.TESTSERVER_URL + reverse('testresource-detail', kwargs={'pk': self.test_resource_1.id}),
                          test_resource_links['self']['href'])
         self.assertEqual(
@@ -64,7 +74,10 @@ class HalTest(TestCase):
         resp = self.client.get("/test-resources/1/")
         test_resource_data = resp.data
         related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
-        self.assertEqual(5, len(related_resource_2_data))
+        self.assertEqual(
+            {'active', '_links', '_embedded', 'name', 'id'},
+            set(related_resource_2_data.keys())
+        )
         self.assertEqual(self.related_resource_2.name, related_resource_2_data['name'])
 
     def test_embedded_resource_links(self):
@@ -72,13 +85,17 @@ class HalTest(TestCase):
         test_resource_data = resp.data
         related_resource_2_data = test_resource_data[EMBEDDED_FIELD_NAME]['related_resource_2']
         related_resource_2_links = related_resource_2_data[LINKS_FIELD_NAME]
-        self.assertEqual(3, len(related_resource_2_links))
+        self.assertEqual(
+            {'related_resources_1', 'self', 'related_resources'},
+            set(related_resource_2_links.keys())
+        )
         self.assertEqual(
             self.TESTSERVER_URL + reverse('relatedresource2-detail', kwargs={'pk': self.related_resource_2.id}),
             related_resource_2_links['self']['href'])
 
     def test_link_titles(self):
         resp = self.client.get("/related-resources-2/1/")
+        self.assertIn('related_resources_1', resp.data[LINKS_FIELD_NAME])
         related = resp.data[LINKS_FIELD_NAME]['related_resources_1']
         self.assertEqual(2, len(related))
         self.assertEqual('Nested-Related-Resource11', related[0]['title'])
@@ -87,7 +104,10 @@ class HalTest(TestCase):
     def test_custom_lookup_field(self):
         resp = self.client.get("/custom-resources/1/")
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
-        self.assertEqual(3, len(custom_resource_links))
+        self.assertEqual(
+            {'self', 'related_resource_3', 'custom_link'},
+            set(custom_resource_links.keys())
+        )
         self.assertEqual(
             self.TESTSERVER_URL + reverse("customresource-detail", kwargs={"pk": self.custom_resource_1.id}),
             custom_resource_links["self"]["href"])
@@ -109,17 +129,26 @@ class HalTest(TestCase):
         self.assertEqual(self.TESTSERVER_URL + '/example/?foo=bar',
                          custom_resource_links["url_rel_processed"]["href"])
 
+    def test_slug(self):
+        slug = self.client.get("/slug-resources/1/").data
+        print(slug)
+        self.assertEqual(
+            {LINKS_FIELD_NAME, 'slug_related'},
+            set(slug.keys())
+        )
+        self.assertNotIn('slug_related', slug[LINKS_FIELD_NAME])
+
     def test_pagination(self):
         no_pages = self.client.get("/test-resources/").data
-        self.assertIn("self", no_pages["_links"])
-        self.assertNotIn("previous", no_pages["_links"])
-        self.assertNotIn("next", no_pages["_links"])
+        self.assertIn("self", no_pages[LINKS_FIELD_NAME])
+        self.assertNotIn("previous", no_pages[LINKS_FIELD_NAME])
+        self.assertNotIn("next", no_pages[LINKS_FIELD_NAME])
 
         pages = self.client.get("/abundant-resources/").data
-        self.assertIn("self", pages["_links"])
-        self.assertNotIn("previous", pages["_links"])
-        self.assertIn("next", pages["_links"])
-        next_link = pages["_links"]["next"]["href"]
+        self.assertIn("self", pages[LINKS_FIELD_NAME])
+        self.assertNotIn("previous", pages[LINKS_FIELD_NAME])
+        self.assertIn("next", pages[LINKS_FIELD_NAME])
+        next_link = pages[LINKS_FIELD_NAME]["next"]["href"]
 
         unpaged = self.client.get("/abundant-unpaged/").data
         # Renders with _links and _embedded
@@ -131,9 +160,9 @@ class HalTest(TestCase):
         self.assertNotIn("next", unpaged["_links"])
 
         pages = self.client.get(next_link).data
-        self.assertIn("self", pages["_links"])
-        self.assertIn("previous", pages["_links"])
-        self.assertIn("next", pages["_links"])
+        self.assertIn("self", pages[LINKS_FIELD_NAME])
+        self.assertIn("previous", pages[LINKS_FIELD_NAME])
+        self.assertIn("next", pages[LINKS_FIELD_NAME])
 
     def test_empty_relation(self):
         resp = self.client.get("/custom-resources/1/")
@@ -147,13 +176,22 @@ class HalTest(TestCase):
     def test_filefield_serialization(self):
         resp = self.client.get("/file-resources/1/")
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
-        self.assertIn("file", custom_resource_links)
-        self.assertIn("title", custom_resource_links['file'])
-        self.assertEqual(custom_resource_links['file']['type'], "application/zip")
-        self.assertIn("image", custom_resource_links)
-        self.assertIn("self", custom_resource_links)
-        # HalContributeToLinkField returning None should be suppressed
-        self.assertNotIn("none", custom_resource_links['self'])
+        self.assertNotIn("file", custom_resource_links,
+                         msg="basic FileFields should not be included in links")
+        self.assertNotIn("none", custom_resource_links['self'],
+                         msg="HalContributeToLinkField returning None should be suppressed")
+
+    def test_readme_contribute_example(self):
+        resp = self.client.get("/hal-file-resources/1/")
+        custom_resource_links = resp.data[LINKS_FIELD_NAME]
+        self.assertIn("file", custom_resource_links,
+                      msg='HalFileField should be included in _links')
+        self.assertIn("title", custom_resource_links['file'],
+                      msg='HalContributeToLinkField should have been included in _links.file')
+        self.assertIn("type", custom_resource_links['file'],
+                      msg='HalContributeToLinkField should have been included in _links.file')
+        self.assertEqual(custom_resource_links['file']['type'], "application/zip",
+                         msg='_links.file.type should equal static return of get_file_type (i.e. "application/zip")')
 
     def test_serializer_method_link(self):
         resp = self.client.get("/custom-resources/1/")

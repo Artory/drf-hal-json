@@ -94,4 +94,11 @@ class Migration(migrations.Migration):
             name='related_resource_3',
             field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='testproject.RelatedResource3'),
         ),
+        migrations.CreateModel(
+            name='SlugRelatedResource',
+            fields=[
+                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('slug_related', models.ManyToManyField(to='testproject.TestResource')),
+            ],
+        ),
     ]

@@ -2,7 +2,12 @@ from rest_framework import serializers
 from rest_framework.relations import Hyperlink
 
 
-class HalHyperlinkedPropertyField(serializers.Field):
+class HalIncludeInLinksMixin(object):
+    """Mixin to flag a field as needing included in the _links section"""
+    pass
+
+
+class HalHyperlinkedPropertyField(HalIncludeInLinksMixin, serializers.Field):
     process_value = None
 
     def __init__(self, **kwargs):
@@ -19,7 +24,8 @@ class HalHyperlinkedPropertyField(serializers.Field):
     def to_internal_value(self, data):
         raise NotImplementedError()
 
-class HalHyperlinkedSerializerMethodField(serializers.SerializerMethodField):
+
+class HalHyperlinkedSerializerMethodField(HalIncludeInLinksMixin, serializers.SerializerMethodField):
     def __init__(self, **kwargs):
         super(HalHyperlinkedSerializerMethodField, self).__init__(**kwargs)
 
@@ -39,7 +45,7 @@ class HalContributeToLinkField(serializers.SerializerMethodField):
         super(HalContributeToLinkField, self).__init__(**kwargs)
 
 
-class HalHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
+class HalHyperlinkedRelatedField(HalIncludeInLinksMixin, serializers.HyperlinkedRelatedField):
 
     def __init__(self, **kwargs):
         self.title_field = kwargs.pop('title_field', None)
@@ -70,7 +76,7 @@ class HalHyperlinkedRelatedField(serializers.HyperlinkedRelatedField):
         return val
 
 
-class HalHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
+class HalHyperlinkedIdentityField(HalIncludeInLinksMixin, serializers.HyperlinkedIdentityField):
 
     def __init__(self, **kwargs):
         self.title_field = kwargs.pop('title_field', None)
@@ -99,3 +105,7 @@ class HalHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
             val['name'] = getattr(instance, self.name_field)
 
         return val
+
+
+class HalFileField(HalIncludeInLinksMixin, serializers.FileField):
+    pass

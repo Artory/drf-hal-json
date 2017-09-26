@@ -3,10 +3,9 @@ from collections import defaultdict
 from rest_framework.utils.serializer_helpers import ReturnDict
 
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
-from drf_hal_json.fields import HalHyperlinkedPropertyField, HalContributeToLinkField, \
-    HalHyperlinkedSerializerMethodField
-from rest_framework.fields import empty, FileField, ImageField
-from rest_framework.relations import HyperlinkedIdentityField, HyperlinkedRelatedField, ManyRelatedField, RelatedField
+from drf_hal_json.fields import HalContributeToLinkField, HalHyperlinkedIdentityField, HalIncludeInLinksMixin
+from rest_framework.fields import empty
+from rest_framework.relations import ManyRelatedField, HyperlinkedRelatedField
 from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer, ListSerializer
 from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 
@@ -37,6 +36,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
     Serializer for HAL representation of django models
     """
     serializer_related_field = HyperlinkedRelatedField
+    serializer_url_field = HalHyperlinkedIdentityField
     default_list_serializer = HalListSerializer
 
     def __init__(self, instance=None, data=empty, **kwargs):
@@ -117,13 +117,10 @@ class HalModelSerializer(HyperlinkedModelSerializer):
 
     @staticmethod
     def _is_link_field(field):
-        return (isinstance(field, RelatedField) or
-                isinstance(field, ManyRelatedField) or
-                isinstance(field, HyperlinkedIdentityField) or
-                isinstance(field, HalHyperlinkedPropertyField) or
-                isinstance(field, HalHyperlinkedSerializerMethodField) or
-                isinstance(field, FileField) or
-                isinstance(field, ImageField))
+        # ManyRelatedField could wrap any type so we need to analyze the underlying type
+        if isinstance(field, ManyRelatedField):
+            field = field.child_relation
+        return isinstance(field, HalIncludeInLinksMixin)
 
     @staticmethod
     def _is_link_contribution_field(field):

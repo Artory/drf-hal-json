@@ -38,6 +38,10 @@ class CustomResource(models.Model):
     name = models.CharField(max_length=255)
 
 
+class SlugRelatedResource(models.Model):
+    slug_related = models.ManyToManyField(TestResource)
+
+
 class AbundantResource(models.Model):
     created = models.DateTimeField(auto_now=True)
     name = models.CharField(max_length=255)
@@ -49,5 +53,5 @@ class URLResource(models.Model):
 
 
 class FileResource(models.Model):
-    file = models.FileField(max_length=255)
-    image = models.ImageField(max_length=255)
+    file = models.FileField(max_length=255, upload_to='./tmp')
+    image = models.ImageField(max_length=255, upload_to='./tmp')
