@@ -131,7 +131,6 @@ class HalTest(TestCase):
 
     def test_slug(self):
         slug = self.client.get("/slug-resources/1/").data
-        print(slug)
         self.assertEqual(
             {LINKS_FIELD_NAME, 'slug_related'},
             set(slug.keys())
@@ -149,6 +148,7 @@ class HalTest(TestCase):
         self.assertNotIn("previous", pages[LINKS_FIELD_NAME])
         self.assertIn("next", pages[LINKS_FIELD_NAME])
         next_link = pages[LINKS_FIELD_NAME]["next"]["href"]
+        self.assertEqual(len(pages['_embedded']['items']), 10)
 
         unpaged = self.client.get("/abundant-unpaged/").data
         # Renders with _links and _embedded
