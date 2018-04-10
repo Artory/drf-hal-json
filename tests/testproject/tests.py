@@ -1,5 +1,7 @@
 from django.core.files.base import ContentFile
 from django.test import TestCase
+from rest_framework.test import APIClient
+
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME
 from rest_framework.reverse import reverse
 
@@ -198,3 +200,45 @@ class HalTest(TestCase):
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
         self.assertIn("custom_link", custom_resource_links)
         self.assertEqual("http://www.example.com", custom_resource_links["custom_link"]["href"])
+
+
+class GetPutSymmetry(TestCase):
+    client_class = APIClient
+
+    def setUp(self):
+        self.url_resource = URLResource.objects.create(
+            url_abs="https://www.example.com/",
+            url_rel="/example/")
+
+    def test_symmetric(self):
+        get = self.client.get("/url-resources/1/")
+        update = self.client.put(
+            "/url-resources/1/",
+            get.data,
+            content_type='application/hal+json'
+        )
+        self.assertEqual(
+            200,
+            update.status_code,
+        )
+
+
+class GetPostSymmetry(TestCase):
+    client_class = APIClient
+
+    def setUp(self):
+        self.url_resource = URLResource.objects.create(
+            url_abs="https://www.example.com/",
+            url_rel="/example/")
+
+    def test_symmetric(self):
+        get = self.client.get("/url-resources/1/")
+        update = self.client.post(
+            "/url-resources/",
+            get.data,
+            content_type='application/hal+json'
+        )
+        self.assertEqual(
+            201,
+            update.status_code,
+        )
