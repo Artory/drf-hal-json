@@ -4,7 +4,7 @@ from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME
 from rest_framework.reverse import reverse
 
 from .models import (AbundantResource, CustomResource, FileResource, RelatedResource1, RelatedResource2,
-                     RelatedResource3, TestResource, URLResource, SlugRelatedResource)
+                     RelatedResource3, SlugRelatedResource, TestResource, URLResource)
 
 
 class HalTest(TestCase):
@@ -105,7 +105,7 @@ class HalTest(TestCase):
         resp = self.client.get("/custom-resources/1/")
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
         self.assertEqual(
-            {'self', 'related_resource_3', 'custom_link'},
+            {'self', 'related_resource_3', 'custom_link', 'custom_link_empty'},
             set(custom_resource_links.keys())
         )
         self.assertEqual(
@@ -198,3 +198,4 @@ class HalTest(TestCase):
         custom_resource_links = resp.data[LINKS_FIELD_NAME]
         self.assertIn("custom_link", custom_resource_links)
         self.assertEqual("http://www.example.com", custom_resource_links["custom_link"]["href"])
+        self.assertIsNone(custom_resource_links["custom_link_empty"]["href"])
