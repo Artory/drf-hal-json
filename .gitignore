@@ -61,4 +61,5 @@ target/
 .vscode
 tests/foo*
 tests/image*
+tests/tmp/
 *.orig

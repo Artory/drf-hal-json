@@ -1,11 +1,11 @@
+from drf_hal_json.fields import (HalContributeToLinkField, HalFileField, HalHyperlinkedIdentityField,
+                                 HalHyperlinkedPropertyField, HalHyperlinkedRelatedField,
+                                 HalHyperlinkedSerializerMethodField)
+from drf_hal_json.serializers import HalModelSerializer
 from rest_framework.relations import SlugRelatedField
 
-from drf_hal_json.fields import (HalContributeToLinkField, HalHyperlinkedIdentityField, HalHyperlinkedPropertyField,
-                                 HalHyperlinkedRelatedField, HalHyperlinkedSerializerMethodField, HalFileField)
-from drf_hal_json.serializers import HalModelSerializer
-
 from .models import (AbundantResource, CustomResource, FileResource, RelatedResource1, RelatedResource2,
-                     RelatedResource3, TestResource, URLResource, SlugRelatedResource)
+                     RelatedResource3, SlugRelatedResource, TestResource, URLResource)
 
 
 class RelatedResource1Serializer(HalModelSerializer):
@@ -61,17 +61,28 @@ class CustomResourceSerializer(HalModelSerializer):
     related_resource_3 = HalHyperlinkedIdentityField(
         read_only=True, view_name='relatedresource3-detail', lookup_field='name')
     custom_link = HalHyperlinkedSerializerMethodField()
+    custom_link_empty = HalHyperlinkedSerializerMethodField()
     name = HalContributeToLinkField(place_on='related_resource_3', property_name='title')
 
     class Meta:
         model = CustomResource
-        fields = ('self', 'name', 'related_resource_2', 'related_resource_3', 'custom_link')
+        fields = (
+            'self',
+            'name',
+            'related_resource_2',
+            'related_resource_3',
+            'custom_link',
+            'custom_link_empty',
+        )
 
     def get_name(self, obj):
         return obj.name
 
     def get_custom_link(self, obj):
         return 'http://www.example.com'
+
+    def get_custom_link_empty(self, obj):
+        return None
 
 
 class SlugRelatedResourceSerializer(HalModelSerializer):
