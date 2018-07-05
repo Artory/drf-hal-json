@@ -26,15 +26,19 @@ class RelatedResource3(models.Model):
 
 class TestResource(models.Model):
     created = models.DateTimeField(auto_now=True)
-    related_resource_1 = models.ForeignKey(RelatedResource1)
-    related_resource_2 = models.OneToOneField(RelatedResource2)
+    related_resource_1 = models.ForeignKey(
+        RelatedResource1, on_delete=models.CASCADE)
+    related_resource_2 = models.OneToOneField(
+        RelatedResource2, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
 
 class CustomResource(models.Model):
     created = models.DateTimeField(auto_now=True)
-    related_resource_2 = models.ForeignKey(RelatedResource2, null=True, default=None)
-    related_resource_3 = models.ForeignKey(RelatedResource3)
+    related_resource_2 = models.ForeignKey(
+        RelatedResource2, on_delete=models.CASCADE, null=True, default=None)
+    related_resource_3 = models.ForeignKey(
+        RelatedResource3, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
 
 
