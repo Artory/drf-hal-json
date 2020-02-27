@@ -4,7 +4,7 @@ from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
 from drf_hal_json.fields import HalContributeToLinkField, HalHyperlinkedIdentityField, HalIncludeInLinksMixin
 from rest_framework.fields import empty
 from rest_framework.relations import HyperlinkedRelatedField, ManyRelatedField
-from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer, ListSerializer
+from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer, ListSerializer, Serializer
 from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 from rest_framework.utils.serializer_helpers import ReturnDict
 
@@ -30,16 +30,12 @@ class HalListSerializer(ListSerializer):
         )
 
 
-class HalModelSerializer(HyperlinkedModelSerializer):
-    """
-    Serializer for HAL representation of django models
-    """
-    serializer_related_field = HyperlinkedRelatedField
-    serializer_url_field = HalHyperlinkedIdentityField
+class HalSerializer(Serializer):
+
     default_list_serializer = HalListSerializer
 
     def __init__(self, instance=None, data=empty, **kwargs):
-        super(HalModelSerializer, self).__init__(instance, data, **kwargs)
+        super(HalSerializer, self).__init__(instance, data, **kwargs)
         self.nested_serializer_class = self.__class__
         if data != empty and not LINKS_FIELD_NAME in data:
             data[LINKS_FIELD_NAME] = dict()  # put links in data, so that field validation does not fail
@@ -56,7 +52,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         list_serializer_class = getattr(meta, 'list_serializer_class', None)
         if list_serializer_class is None:
             setattr(meta, 'list_serializer_class', cls.default_list_serializer)
-        return super(HalModelSerializer, cls).many_init(*args, **kwargs)
+        return super(HalSerializer, cls).many_init(*args, **kwargs)
 
     def build_link_object(self, val):
         if (type([]) == type(val)):
@@ -72,7 +68,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
             return None
 
     def to_representation(self, instance):
-        ret = super(HalModelSerializer, self).to_representation(instance)
+        ret = super(HalSerializer, self).to_representation(instance)
         resp = defaultdict(dict)
 
         for field_name in self.link_field_names:
@@ -87,6 +83,8 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         for field_name in self.embedded_field_names:
             # if a related resource is embedded, it should still
             # get a link in the parent object
+            if field_name not in ret:
+                continue
             if type(ret[field_name]) == list:
                 embed_self = list(filter(lambda x: x is not None, [self._get_url(x) for x in ret[field_name] if x]))
             else:
@@ -99,7 +97,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         return resp
 
     def get_fields(self):
-        fields = super(HalModelSerializer, self).get_fields()
+        fields = super(HalSerializer, self).get_fields()
 
         self.embedded_field_names = []
         self.link_field_names = []
@@ -133,7 +131,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         """
         Create nested fields for forward and reverse relationships.
         """
-        class NestedSerializer(HalModelSerializer):
+        class NestedSerializer(HalSerializer):
             class Meta:
                 model = relation_info.related_model
                 depth = nested_depth - 1
@@ -143,3 +141,11 @@ class HalModelSerializer(HyperlinkedModelSerializer):
         field_kwargs = get_nested_relation_kwargs(relation_info)
 
         return field_class, field_kwargs
+
+
+class HalModelSerializer(HalSerializer, HyperlinkedModelSerializer):
+    """
+    Serializer for HAL representation of django models
+    """
+    serializer_related_field = HyperlinkedRelatedField
+    serializer_url_field = HalHyperlinkedIdentityField
