@@ -35,7 +35,7 @@ class HalSerializer(Serializer):
     default_list_serializer = HalListSerializer
 
     def __init__(self, instance=None, data=empty, **kwargs):
-        super(HalSerializerMixin, self).__init__(instance, data, **kwargs)
+        super(HalSerializer, self).__init__(instance, data, **kwargs)
         self.nested_serializer_class = self.__class__
         if data != empty and not LINKS_FIELD_NAME in data:
             data[LINKS_FIELD_NAME] = dict()  # put links in data, so that field validation does not fail
@@ -52,7 +52,7 @@ class HalSerializer(Serializer):
         list_serializer_class = getattr(meta, 'list_serializer_class', None)
         if list_serializer_class is None:
             setattr(meta, 'list_serializer_class', cls.default_list_serializer)
-        return super(HalSerializerMixin, cls).many_init(*args, **kwargs)
+        return super(HalSerializer, cls).many_init(*args, **kwargs)
 
     def build_link_object(self, val):
         if (type([]) == type(val)):
@@ -68,7 +68,7 @@ class HalSerializer(Serializer):
             return None
 
     def to_representation(self, instance):
-        ret = super(HalSerializerMixin, self).to_representation(instance)
+        ret = super(HalSerializer, self).to_representation(instance)
         resp = defaultdict(dict)
 
         for field_name in self.link_field_names:
@@ -97,7 +97,7 @@ class HalSerializer(Serializer):
         return resp
 
     def get_fields(self):
-        fields = super(HalSerializerMixin, self).get_fields()
+        fields = super(HalSerializer, self).get_fields()
 
         self.embedded_field_names = []
         self.link_field_names = []
@@ -131,7 +131,7 @@ class HalSerializer(Serializer):
         """
         Create nested fields for forward and reverse relationships.
         """
-        class NestedSerializer(HalSerializerMixin):
+        class NestedSerializer(HalSerializer):
             class Meta:
                 model = relation_info.related_model
                 depth = nested_depth - 1
@@ -143,7 +143,7 @@ class HalSerializer(Serializer):
         return field_class, field_kwargs
 
 
-class HalModelSerializer(HalSerializerMixin, HyperlinkedModelSerializer):
+class HalModelSerializer(HalSerializer, HyperlinkedModelSerializer):
     """
     Serializer for HAL representation of django models
     """
