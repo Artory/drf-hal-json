@@ -31,7 +31,7 @@ class HalListSerializer(ListSerializer):
         )
 
 
-class HalSerializerMixin(Serializer):
+class HalSerializer(Serializer):
 
     default_list_serializer = HalListSerializer
 
