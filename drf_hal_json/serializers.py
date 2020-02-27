@@ -4,10 +4,9 @@ from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
 from drf_hal_json.fields import HalContributeToLinkField, HalHyperlinkedIdentityField, HalIncludeInLinksMixin
 from rest_framework.fields import empty
 from rest_framework.relations import HyperlinkedRelatedField, ManyRelatedField
-from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer, ListSerializer
+from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer, ListSerializer, Serializer
 from rest_framework.utils.field_mapping import get_nested_relation_kwargs
 from rest_framework.utils.serializer_helpers import ReturnDict
-from rest_framework.serializers import Serializer
 
 
 class HalListSerializer(ListSerializer):
