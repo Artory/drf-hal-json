@@ -1,7 +1,8 @@
 from collections import defaultdict
 
 from drf_hal_json import EMBEDDED_FIELD_NAME, LINKS_FIELD_NAME, URL_FIELD_NAME
-from drf_hal_json.fields import HalContributeToLinkField, HalHyperlinkedIdentityField, HalIncludeInLinksMixin
+from drf_hal_json.fields import HalContributeToLinkField, HalHyperlinkedIdentityField, HalIncludeInLinksMixin, \
+    HalPromoteEmbeddedMixin
 from rest_framework.fields import empty
 from rest_framework.relations import HyperlinkedRelatedField, ManyRelatedField
 from rest_framework.serializers import BaseSerializer, HyperlinkedModelSerializer, ListSerializer
@@ -127,7 +128,7 @@ class HalModelSerializer(HyperlinkedModelSerializer):
 
     @staticmethod
     def _is_embedded_field(field):
-        return isinstance(field, BaseSerializer)
+        return not isinstance(field, HalPromoteEmbeddedMixin) and isinstance(field, BaseSerializer)
 
     def build_nested_field(self, field_name, relation_info, nested_depth):
         """

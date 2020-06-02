@@ -7,6 +7,10 @@ class HalIncludeInLinksMixin(object):
     pass
 
 
+class HalPromoteEmbeddedMixin(serializers.BaseSerializer):
+    """Mixin to flag a field that should be serialized on the top level of its parent instead of embedded"""
+
+
 class HalHyperlinkedPropertyField(HalIncludeInLinksMixin, serializers.Field):
     process_value = None
 
